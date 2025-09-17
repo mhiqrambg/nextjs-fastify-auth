@@ -1,0 +1,26 @@
+# contoh lokal
+DATABASE_URL=postgres://admin:admin123@localhost:5432/mydb
+
+# jika butuh SSL (mis. cloud PG)
+PGSSLMODE=disable  # or require
+
+# Jwt
+JWT_SECRET = a1kl@asdxxxxdciOiJxxxxNiIsIxxxIkasd
+
+# node
+NODE_ENV = development
+
+# Cors
+CORS_ORIGIN = http://127.0.0.1:3000
+
+# Jobs
+REFRESH_CLEANUP_RETENTION_DAYS = 7
+REFRESH_CLEANUP_BATCH_SIZE = 1000
+REFRESH_CLEANUP_MAX_SECONDS = 30
+
+# Signup
+OTP_EXPIRES_MINUTES = 3
+
+# Waha API
+WAHA_X_API_KEY = a41xxx0b1d7446d183xxxx73f27724d2
+WAHA_API_URL = https://waha.xxx.dev/xxx
