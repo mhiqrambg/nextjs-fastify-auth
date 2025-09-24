@@ -5,7 +5,7 @@ export default function Partners() {
   const partners = usePartners();
 
   return (
-    <section className="bg-[#F2F5FA] py-12 text-center text-black">
+    <section className="bg-[#F2F5FA] py-8 text-center text-black">
       <h2 className="mb-6 text-xl font-semibold">
         We collaborate with the best educational institutions and brands
       </h2>

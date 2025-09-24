@@ -3,9 +3,9 @@ import { z } from "zod";
 export const UserRow = z.object({
   id: z.uuid(),
   name: z.string(),
-  email: z.email(),
   role: z.enum(["admin", "user"]),
   tv: z.number(),
+  email: z.string(),
   password: z.string(),
   phone_number: z.string(),
   phone_verified_at: z.string(),
@@ -15,9 +15,9 @@ export const UserRow = z.object({
 
 export const CreateUserInput = z.object({
   name: z.string().min(1),
-  email: z.email(),
   password: z.string().min(5),
   phone_number: z.string(),
+  email: z.email(),
 });
 
 export const UpdateUserParams = z.object({

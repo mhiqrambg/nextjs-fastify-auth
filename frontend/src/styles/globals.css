@@ -7,6 +7,16 @@
   --color-quiz-navy: #003366;
   --color-quiz-black: #000000;
   --color-quiz-white: #ffffff;
+
+  /* Font family configuration */
+  --font-family-sans:
+    var(--font-inter), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Font weight utilities */
+.font-bold {
+  font-weight: 700;
 }
 
 input,

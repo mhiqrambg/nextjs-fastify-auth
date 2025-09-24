@@ -14,10 +14,10 @@ import {
 
 import Image from "next/image";
 
-import { useLogin } from "@/components/layouts/NavBar/useLogin";
-import LoginModal from "./LoginModal";
-import SignupModal from "./SignupModal";
-import { useSignup } from "./useSignup";
+import { useLogin } from "@/hooks/auth/useLogin";
+import SigninModal from "@/components/views/auth/SigninModal";
+import { useResetPassword } from "@/hooks/auth/useResetPassword";
+import ResetPasswordModal from "@/components/views/auth/ResetPasswordModal";
 
 export default function App({
   className = "",
@@ -27,8 +27,13 @@ export default function App({
   position?: "static" | "sticky";
 }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { onOpen, isOpen, onOpenChange } = useLogin();
-  const signup = useSignup();
+  const { onOpen: onOpenSignin, isOpen, onOpenChange, onClose } = useLogin();
+  const {
+    onOpen: onOpenReset,
+    onOpenChange: onOpenChangeReset,
+    isOpen: isOpenReset,
+    onClose: onCloseReset,
+  } = useResetPassword();
 
   // satukan menu utama
   const menuItems = [
@@ -57,7 +62,7 @@ export default function App({
       <NavbarContent className="pr-3 sm:hidden" justify="center">
         <NavbarBrand>
           <Link href="/">
-            <Image src="/logo.webp" alt="Quizolah" width={100} height={100} />
+            <Image src="/logo.png" alt="Quizolah" width={100} height={100} />
           </Link>
         </NavbarBrand>
       </NavbarContent>
@@ -66,7 +71,7 @@ export default function App({
       <NavbarContent className="hidden sm:flex" justify="center">
         <NavbarBrand>
           <Link href="/">
-            <Image src="/logo.webp" alt="Quizolah" width={100} height={100} />
+            <Image src="/logo.png" alt="Quizolah" width={100} height={100} />
           </Link>
         </NavbarBrand>
         {menuItems.map((item) => (
@@ -84,7 +89,7 @@ export default function App({
       {/* Login/Signup */}
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
-          <Link color="foreground" onPress={signup.onOpen}>
+          <Link color="foreground" href="/auth/signup">
             Sign up
           </Link>
         </NavbarItem>
@@ -92,7 +97,7 @@ export default function App({
           <Button
             className="bg-quiz-navy text-white shadow-lg"
             radius="full"
-            onPress={onOpen}
+            onPress={onOpenSignin}
           >
             Log in
           </Button>
@@ -114,17 +119,17 @@ export default function App({
           </NavbarMenuItem>
         ))}
       </NavbarMenu>
-      <LoginModal isOpen={isOpen} onOpenChange={onOpenChange} />
-      <SignupModal
-        isOpen={signup.isOpen}
-        onOpenChange={signup.onOpenChange}
-        onClose={signup.onClose}
-        step={signup.step}
-        formData={signup.formData}
-        handleChange={signup.handleChange}
-        nextStep={signup.nextStep}
-        prevStep={signup.prevStep}
-        handleSubmit={signup.handleSubmit}
+      <SigninModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onOpenReset={onOpenReset}
+        isClose={onClose}
+      />
+      <ResetPasswordModal
+        isOpen={isOpenReset}
+        onOpenChange={onOpenChangeReset}
+        onOpenSignin={onOpenSignin}
+        onClose={onCloseReset}
       />
     </Navbar>
   );

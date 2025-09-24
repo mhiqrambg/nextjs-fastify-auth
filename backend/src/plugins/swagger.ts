@@ -18,7 +18,7 @@ export default fp(async function swaggerPlugin(app: FastifyInstance) {
       },
       servers: [
         {
-          url: process.env.API_BASE_URL || "http://127.0.0.1:3000",
+          url: process.env.API_BASE_URL || "http://localhost:3000",
           description: "Current server",
         },
       ],
@@ -39,7 +39,6 @@ export default fp(async function swaggerPlugin(app: FastifyInstance) {
         {
           name: "Auth",
           description: "Authentication endpoints",
-          externalDocs: { url: "https://github.com/fastify/fastify-jwt" },
         },
         {
           name: "Users",

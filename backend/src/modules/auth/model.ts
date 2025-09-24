@@ -42,18 +42,29 @@ export const authModel = (app: FastifyInstance) => ({
     return user.rows[0] ?? null;
   },
 
+  // Memperbarui fungsi untuk mencari OTP yang valid dan terbaru
   findOtpByPhone: async (phone_number: string) => {
-    const otp = await app.pg.query<OTPRow>(
-      `SELECT * FROM otps WHERE phone_number = $1`,
-      [phone_number]
-    );
+    const otpQuery = `
+    SELECT * 
+    FROM otps
+    WHERE phone_number = $1 
+      AND used_at IS NULL  -- Hanya yang belum digunakan
+      AND expires_at > NOW()  -- Hanya yang belum kadaluarsa
+    ORDER BY expires_at DESC  -- Urutkan berdasarkan waktu kadaluarsa (terbaru di atas)
+    LIMIT 1;  -- Ambil hanya 1 OTP yang valid dan terbaru
+  `;
+
+    // Menjalankan query untuk mencari OTP
+    const otp = await app.pg.query<OTPRow>(otpQuery, [phone_number]);
+
+    // Mengembalikan OTP yang ditemukan (atau null jika tidak ada yang valid)
     return otp.rows[0] ?? null;
   },
 
   createUser: async (data: TCreateUserInput) => {
     const user = await app.pg.query<TUserRow>(
-      `INSERT INTO users (name, email, password, phone_number) VALUES ($1, $2, $3, $4) RETURNING *`,
-      [data.name, data.email, data.password, data.phone_number]
+      `INSERT INTO users (name, password, phone_number, email) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [data.name, data.password, data.phone_number, data.email]
     );
 
     // remove password

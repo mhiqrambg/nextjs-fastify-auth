@@ -11,7 +11,8 @@ JWT_SECRET = a1kl@asdxxxxdciOiJxxxxNiIsIxxxIkasd
 NODE_ENV = development
 
 # Cors
-CORS_ORIGIN = http://127.0.0.1:3000
+API_BASE_URL = http://localhost:3000
+CORS_ORIGIN = http://localhost:3000,http://localhost:4000
 
 # Jobs
 REFRESH_CLEANUP_RETENTION_DAYS = 7

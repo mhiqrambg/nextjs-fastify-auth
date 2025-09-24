@@ -16,8 +16,8 @@ export type RefreshRepo = ReturnType<typeof refreshModel>;
 export const authService = (repo: AuthRepo) => ({
   signup: async (data: SignUpInput) => {
     const existingUser = await repo.findUserByEmailOrPhone(
-      data.email,
-      data.phone_number
+      data.phone_number,
+      data.email
     );
 
     if (existingUser) {
@@ -33,9 +33,9 @@ export const authService = (repo: AuthRepo) => ({
 
     const user = await repo.createUser({
       name: data.name,
-      email: data.email,
       password: hashedPassword,
       phone_number: data.phone_number,
+      email: data.email,
     });
 
     return user;
@@ -71,12 +71,14 @@ export const authService = (repo: AuthRepo) => ({
 
   verifyOtp: async (data: VerifyOtpInput) => {
     const dataOtp = await repo.findOtpByPhone(data.phone_number);
-
     if (!dataOtp) throw new Error("Invalid OTP");
 
     if (dataOtp.used_at) throw new Error("OTP already used");
 
-    if (new Date(dataOtp.expires_at) < new Date()) {
+    const currentDateUTC = new Date().toISOString();
+    const expiresAt = new Date(dataOtp.expires_at);
+
+    if (expiresAt < new Date(currentDateUTC)) {
       throw new Error("OTP expired");
     }
 

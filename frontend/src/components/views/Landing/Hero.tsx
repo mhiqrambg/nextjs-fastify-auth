@@ -21,7 +21,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative flex min-h-[90vh] items-center justify-center text-white">
+    <section className="relative flex min-h-[90vh] items-center justify-center text-white md:min-h-[60vh]">
       {/* Background pattern */}
       <div
         className="absolute inset-0"
@@ -41,8 +41,8 @@ export default function Hero() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
             <h1 className="text-4xl font-bold drop-shadow-lg md:text-5xl">
-              Powerful online test and quiz maker
-              <span className="text-quiz-gold"> Quizolah here</span>
+              Platform <span className="text-quiz-navy">online test</span> &
+              <span className="text-quiz-gold"> quiz maker </span>
             </h1>
             <p className="mt-4 max-w-xl text-lg opacity-90 md:mt-6">
               Quiz makes it easy for teachers to create secure, modern, and
@@ -67,7 +67,7 @@ export default function Hero() {
                 errorMessage="Exam code not found"
               />
               <Button
-                color="primary"
+                color="warning"
                 isLoading={isLoading}
                 type="submit"
                 size="sm"

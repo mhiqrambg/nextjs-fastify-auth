@@ -15,7 +15,8 @@ export const minutesFromNow = (min: number) =>
   new Date(Date.now() + min * 60 * 1000);
 
 export function getExpiry(minutes = 5): Date {
-  return new Date(Date.now() + minutes * 60 * 1000);
+  const expiresAt = new Date(Date.now() + minutes * 60 * 1000);
+  return new Date(expiresAt.toISOString());
 }
 
 export function formatPhoneNumber(phone: string): string {

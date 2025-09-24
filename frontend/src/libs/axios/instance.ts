@@ -1,10 +1,18 @@
-import axios from "axios";
+import axios, {
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+  AxiosRequestHeaders,
+} from "axios";
 import environment from "@/config/environment";
 import { getSession } from "next-auth/react";
 import { DefaultSession } from "next-auth";
 
 interface Session extends DefaultSession {
   accessToken?: string;
+}
+
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  skipAuth?: boolean;
 }
 
 const instance = axios.create({
@@ -16,25 +24,25 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(
-  async (request) => {
-    const session: Session | null = await getSession();
-    if (session) {
-      request.headers.Authorization = `Bearer ${session.accessToken as string}`;
+  async (request: CustomAxiosRequestConfig) => {
+    // selalu pastikan headers ada
+    request.headers = (request.headers || {}) as AxiosRequestHeaders;
+
+    if (!request.skipAuth) {
+      const session: Session | null = await getSession();
+      if (session?.accessToken) {
+        request.headers.Authorization = `Bearer ${session.accessToken}`;
+      }
     }
+
     return request;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error),
 );
 
 instance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (response) => response,
+  (error) => Promise.reject(error),
 );
 
 export default instance;

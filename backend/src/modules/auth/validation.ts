@@ -24,18 +24,15 @@ export const ResendOtpSchema = z.object({
   id: z.uuid(),
   phone_number: z
     .string()
-    .min(10, { error: "Nomor telepon minimal 10 karakter" }),
+    .min(10, { error: "Phone number must be at least 10 characters long." }),
 });
 
 export const VerifyOtpSchema = z.object({
   id: z.uuid(),
   phone_number: z
     .string()
-    .min(10, { error: "Nomor telepon minimal 10 karakter" }),
-  otp: z
-    .string()
-    .min(4, { message: "OTP minimal 4 karakter" })
-    .max(6, { message: "OTP maksimal 6 karakter" }),
+    .min(10, { error: "Phone number must be at least 10 characters long." }),
+  otp: z.string().min(6, { error: "OTP must be at least 6 characters." }),
 });
 
 export const RefreshTokenSchema = z.object({
@@ -52,11 +49,13 @@ export const RefreshTokenMetaSchema = z.object({
 
 export const SignUpSchema = z
   .object({
-    name: z.string().min(4, { error: "Nama minimal 4 karakter" }),
-    email: z.email({ error: "Email tidak valid" }),
+    name: z
+      .string()
+      .min(4, { error: "Name must be at least 4 characters long." }),
+    email: z.email({ error: "Invalid email address" }),
     phone_number: z
       .string()
-      .min(10, { error: "Nomor telepon minimal 10 karakter" }),
+      .min(10, { error: "Phone number must be at least 10 characters long." }),
     password: z
       .string()
       .regex(/^(?=.*[a-z])(?=.*[A-Z])()(?=.*[^A-Za-z0-9]).{5,}$/),

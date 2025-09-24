@@ -20,6 +20,17 @@ export default fp(async (app) => {
     idleTimeoutMillis: 30000,
   });
 
+  // ✅ Health check saat startup
+  try {
+    const client = await app.pg.pool.connect();
+    await client.query("SELECT 1");
+    client.release();
+    app.log.info("Database connection established");
+  } catch (err) {
+    app.log.error({ err }, "Failed to connect to database");
+    throw err; // stop server listen
+  }
+
   // Set schema default agar bisa query tanpa prefix "app."
   app.pg.pool.on("connect", (client) => {
     client.query(`SET search_path TO app, public`);
@@ -61,8 +72,6 @@ export default fp(async (app) => {
   };
 
   app.decorate("db", dbHelpers);
-
-  app.log.info("Success connect to database");
 });
 
 // 🔐 Augment type Fastify

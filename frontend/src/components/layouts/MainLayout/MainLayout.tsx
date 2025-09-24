@@ -11,7 +11,7 @@ export default function MainLayout({
     <>
       <PageHead title="Quizolah - Platform Ujian" />
       <Navbar />
-      <main className="min-h-screen">{children}</main>
+      <main>{children}</main>
       <Footer />
     </>
   );

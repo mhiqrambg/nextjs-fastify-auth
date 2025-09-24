@@ -32,6 +32,7 @@ export default async function authRoutes(app: FastifyInstance) {
         tags: ["Auth"],
         summary: "Sign up",
       },
+      attachValidation: true,
     },
     ctrl.signup
   );
@@ -41,7 +42,10 @@ export default async function authRoutes(app: FastifyInstance) {
     {
       schema: {
         body: VerifyOtpSchemaJSON,
+        tags: ["Auth"],
+        summary: "Verify OTP",
       },
+      attachValidation: true,
     },
     ctrl.verifyOtp
   );
@@ -51,6 +55,8 @@ export default async function authRoutes(app: FastifyInstance) {
     {
       schema: {
         body: ResendOtpSchemaJSON,
+        tags: ["Auth"],
+        summary: "Resend OTP",
       },
     },
     ctrl.resendOtp

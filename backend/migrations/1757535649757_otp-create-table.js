@@ -1,5 +1,5 @@
 // migrations/1756149999999_create-otps-table.js
-exports.up = (pgm) => {
+export const up = (pgm) => {
   pgm.createTable("otps", {
     id: "id",
     phone_number: { type: "varchar(20)", notNull: true },
@@ -18,6 +18,6 @@ exports.up = (pgm) => {
   pgm.createIndex("otps", "expires_at");
 };
 
-exports.down = (pgm) => {
+export const down = (pgm) => {
   pgm.dropTable("otps");
 };

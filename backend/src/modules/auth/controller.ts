@@ -11,7 +11,6 @@ import {
 import type { AuthService, RefreshService } from "./service";
 import { createAccessToken, createRefreshToken } from "../../utils/jwt";
 import { formatPhoneNumber } from "../../utils";
-import { $ZodCheckLengthEquals } from "zod/v4/core";
 
 export const authController = (svc: AuthService) => ({
   signup: async (req: FastifyRequest, reply: FastifyReply) => {
