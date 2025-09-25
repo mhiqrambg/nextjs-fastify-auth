@@ -1,20 +1,60 @@
-import Footer from "@/components/layouts/Footer/Footer";
-import Sidebar from "@/components/layouts/Sidebar";
-import PageHead from "@/components/commons/PageHead";
+import { useState } from "react";
 
-export default function DashboardLayout({
-  children,
-}: {
+import PageHead from "@/components/commons/PageHead";
+import DashboardLayoutSidebar from "@/components/layouts/DashboardLayout/DashboardLayoutSidebar";
+import {
+  SIDEBAR_ADMIN,
+  SIDEBAR_STUDENT,
+  SIDEBAR_TEACHER,
+} from "./DashboardLayout.constan";
+import { Navbar, NavbarMenuToggle } from "@heroui/react";
+
+const DashboardLayout = (props: {
   children: React.ReactNode;
-}) {
+  title: string;
+  type: "student" | "teacher" | "admin";
+  isOpen: boolean;
+}) => {
+  const { children, title, type } = props;
+  const [open, setOpen] = useState(false);
+
   return (
     <>
-      <PageHead title="Dashboard" />
-      <Sidebar />
-      <div className="ml-0 flex min-h-screen flex-1 flex-col md:ml-64">
-        <main>{children}</main>
+      <PageHead title={`Quizolah | ${title}`} />
+      <div className="max-w-screen-3xl 3xl:container flex">
+        <DashboardLayoutSidebar
+          sidebarItems={
+            type === "student"
+              ? SIDEBAR_STUDENT
+              : type === "teacher"
+                ? SIDEBAR_TEACHER
+                : SIDEBAR_ADMIN
+          }
+          isOpen={open}
+        />
+        <div className="h-screen w-full overflow-y-auto px-4">
+          <Navbar
+            className="flex justify-between bg-transparent px-0"
+            isBlurred={false}
+            position="static"
+            classNames={{
+              wrapper: "px-0",
+            }}
+          >
+            <h1 className="text-2xl font-bold">{title}</h1>
+            <NavbarMenuToggle
+              aria-label={open ? "Close menu" : "Open menu"}
+              className="lg:hidden"
+              onClick={() => setOpen(!open)}
+            >
+              <p className="text-2xl font-bold">Menu</p>
+            </NavbarMenuToggle>
+          </Navbar>
+          {children}
+        </div>
       </div>
-      <Footer />
     </>
   );
-}
+};
+
+export default DashboardLayout;

@@ -89,7 +89,6 @@ export function useRegister() {
       reset();
     },
     onError: (err: any) => {
-      console.log("error", err);
       const message =
         err?.response?.data?.details[0]?.message ||
         err.response?.data?.message ||
@@ -106,7 +105,6 @@ export function useRegister() {
   ) =>
     mutateRegister(data, {
       onSuccess: (res) => {
-        // console.log("res", res);
         setUser(res.data.data);
         options?.onSuccess?.(res);
       },

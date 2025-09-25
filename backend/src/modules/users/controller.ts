@@ -13,7 +13,7 @@ export const usersController = (svc: UsersService) => ({
   list: async (req: FastifyRequest, reply: FastifyReply) => {
     const query = ListUsersQuery.parse(req.query);
     const { rows, total } = await svc.list(query);
-    reply.send({
+    return reply.send({
       data: rows,
       pagination: { page: query.page, pageSize: query.pageSize, total },
     });
@@ -59,9 +59,50 @@ export const usersController = (svc: UsersService) => ({
 
     try {
       await svc.delete(id);
-      reply.send({ message: "User deleted successfully" });
+      return reply.send({ message: "User deleted successfully" });
     } catch (err: any) {
       throw app.httpErrors.badRequest(err.message);
+    }
+  },
+
+  dashboard: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id } = req.user;
+
+    try {
+      const user = await svc.findUser(id);
+      if (!user) {
+        throw app.httpErrors.notFound("User not found");
+      }
+
+      return reply.send({
+        message: "Dashboar12d",
+        data: {
+          name: user.name,
+          id: user.id,
+          email: user.email,
+        },
+      });
+    } catch (err: any) {
+      req.log.error(err);
+      throw err;
+    }
+  },
+
+  me: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id } = req.user;
+
+    try {
+      const user = await svc.findUser(id);
+      if (!user) {
+        throw app.httpErrors.notFound("User not found");
+      }
+
+      return reply.send({ message: "success", data: user });
+    } catch (err: any) {
+      req.log.error(err);
+      throw err;
     }
   },
 });

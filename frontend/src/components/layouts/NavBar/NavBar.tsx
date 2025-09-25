@@ -10,11 +10,11 @@ import {
   Button,
   Link,
   cn,
+  useDisclosure,
 } from "@heroui/react";
 
 import Image from "next/image";
 
-import { useLogin } from "@/hooks/auth/useLogin";
 import SigninModal from "@/components/views/auth/SigninModal";
 import { useResetPassword } from "@/hooks/auth/useResetPassword";
 import ResetPasswordModal from "@/components/views/auth/ResetPasswordModal";
@@ -27,7 +27,7 @@ export default function App({
   position?: "static" | "sticky";
 }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { onOpen: onOpenSignin, isOpen, onOpenChange, onClose } = useLogin();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const {
     onOpen: onOpenReset,
     onOpenChange: onOpenChangeReset,
@@ -97,7 +97,7 @@ export default function App({
           <Button
             className="bg-quiz-navy text-white shadow-lg"
             radius="full"
-            onPress={onOpenSignin}
+            onPress={onOpen}
           >
             Log in
           </Button>
@@ -128,7 +128,7 @@ export default function App({
       <ResetPasswordModal
         isOpen={isOpenReset}
         onOpenChange={onOpenChangeReset}
-        onOpenSignin={onOpenSignin}
+        onOpenSignin={onOpen}
         onClose={onCloseReset}
       />
     </Navbar>

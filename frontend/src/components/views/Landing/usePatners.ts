@@ -9,16 +9,15 @@ export function usePartners() {
       logo: "/images/universities/olivia-logo.png",
     },
     {
-      name: "SmartSchool",
+      name: "Rimberio University",
       logo: "/images/universities/rimberio-logo.png",
     },
     {
-      name: "SmartSchool",
+      name: "Saford University",
       logo: "/images/universities/salford-logo.png",
     },
-
     {
-      name: "SmartSchool",
+      name: "Wardiere University",
       logo: "/images/universities/wardiere-logo.png",
     },
   ];

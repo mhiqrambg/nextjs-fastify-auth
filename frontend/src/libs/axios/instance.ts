@@ -1,15 +1,7 @@
-import axios, {
-  AxiosRequestConfig,
-  InternalAxiosRequestConfig,
-  AxiosRequestHeaders,
-} from "axios";
+import axios, { AxiosRequestHeaders, InternalAxiosRequestConfig } from "axios";
 import environment from "@/config/environment";
 import { getSession } from "next-auth/react";
-import { DefaultSession } from "next-auth";
-
-interface Session extends DefaultSession {
-  accessToken?: string;
-}
+import { SessionExtended } from "@/types/Auth";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   skipAuth?: boolean;
@@ -29,7 +21,7 @@ instance.interceptors.request.use(
     request.headers = (request.headers || {}) as AxiosRequestHeaders;
 
     if (!request.skipAuth) {
-      const session: Session | null = await getSession();
+      const session: SessionExtended | null = await getSession();
       if (session?.accessToken) {
         request.headers.Authorization = `Bearer ${session.accessToken}`;
       }

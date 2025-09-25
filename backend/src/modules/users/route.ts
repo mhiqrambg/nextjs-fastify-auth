@@ -7,6 +7,17 @@ import { ParamsUserSchemaJSON } from "./validation";
 export default async function usersRoutes(app: FastifyInstance) {
   const ctrl = usersController(app.usersService);
   app.get(
+    "/me",
+    {
+      preValidation: [app.auth],
+      schema: {
+        tags: ["Users"],
+        summary: "Me",
+      },
+    },
+    ctrl.me
+  );
+  app.get(
     "/",
     {
       schema: { tags: ["Users"], summary: "List users" },
@@ -41,5 +52,32 @@ export default async function usersRoutes(app: FastifyInstance) {
       },
     },
     ctrl.update
+  );
+  app.get(
+    "/dashboard",
+    {
+      preValidation: [app.auth],
+      schema: {
+        tags: ["Users"],
+        summary: "Dashboard",
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              data: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  name: { type: "string" },
+                  email: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    ctrl.dashboard
   );
 }

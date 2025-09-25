@@ -1,12 +1,11 @@
-// src/hooks/useLogin.tsx
-
-import { useDisclosure } from "@heroui/react";
 import * as yup from "yup";
 import { ISignin } from "@/types/Auth";
 import { useMutation } from "@tanstack/react-query";
-import { authService } from "@/services/auth";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { extractErrorMessage } from "@/utils/error";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
 
 const LoginSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -17,8 +16,7 @@ const LoginSchema = yup.object().shape({
 });
 
 export function useLogin() {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -30,20 +28,27 @@ export function useLogin() {
     mode: "onChange",
   });
 
+  const callbackUrl = (router.query.callbackUrl as string) || "/";
+
   const loginService = async (payload: ISignin) => {
-    const res = await authService.signin(payload);
-    return res;
+    const res = await signIn("credentials", {
+      ...payload,
+      redirect: false,
+      callbackUrl,
+    });
+    if (res?.error && res.status === 401) {
+      throw new Error("Email or password is incorrect");
+    }
   };
 
   const { mutate: mutateLogin, isPending: isPendingLogin } = useMutation({
     mutationFn: loginService,
-    onSuccess: () => {
-      onClose();
+    onSuccess: async () => {
+      router.push(callbackUrl);
       reset();
     },
     onError: (err: any) => {
-      const message =
-        err?.response?.data?.message || err.message || "Something went wrong";
+      const message = extractErrorMessage(err);
       setError("root", { message });
     },
   });
@@ -56,9 +61,5 @@ export function useLogin() {
     control,
     errors,
     handleSubmit,
-    isOpen,
-    onOpen,
-    onOpenChange,
-    onClose,
   };
 }

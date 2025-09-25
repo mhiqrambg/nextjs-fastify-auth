@@ -46,6 +46,18 @@ export const usersService = (repo: UsersRepo) => {
       if (!result) throw new Error("Failed to delete user");
       return result;
     },
+
+    findUser: async (id: string) => {
+      const user = await repo.findById(id);
+      if (!user) throw new Error("User not found");
+
+      const newUser = {
+        ...user,
+        password: undefined,
+      };
+
+      return newUser;
+    },
   };
 };
 

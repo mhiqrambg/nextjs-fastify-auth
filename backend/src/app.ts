@@ -33,7 +33,6 @@ export function buildApp(opts: FastifyServerOptions = {}) {
 
   // plugins
   app.register(sensible);
-  app.register(cors);
   app.register(swagger);
   app.register(jwtPlugin);
   app.register(db);
@@ -41,6 +40,7 @@ export function buildApp(opts: FastifyServerOptions = {}) {
   app.register(auth);
   app.register(errorHandler);
   app.register(opsRoute);
+  app.register(cors);
 
   registerRefreshCleanup(app);
 
@@ -49,7 +49,7 @@ export function buildApp(opts: FastifyServerOptions = {}) {
 
   // register per-modul
   app.register(healthRoute, { prefix: "/health" });
-  app.register(usersRoute, { prefix: "/users" });
+  app.register(usersRoute, { prefix: "/user" });
   app.register(authRoute, { prefix: "/auth" });
 
   return app;

@@ -17,6 +17,11 @@
     },
     "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/components/layouts/DashboardLayout/DashboardLayoutSidebar"
+  ],
   "exclude": ["node_modules"]
 }

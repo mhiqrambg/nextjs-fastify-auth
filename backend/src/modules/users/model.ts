@@ -54,10 +54,7 @@ export const usersModel = (app: FastifyInstance) => ({
   },
 
   findById: (id: string) => {
-    return app.db.one<TUserRow>(
-      `SELECT id, name, email, password FROM users WHERE id = $1`,
-      [id]
-    );
+    return app.db.one<TUserRow>(`SELECT * FROM users WHERE id = $1`, [id]);
   },
 
   findUserByEmail: async (email: string): Promise<TUserRow | null> => {

@@ -14,7 +14,12 @@ interface RefreshTokenPayload {
 
 export function createAccessToken(app: FastifyInstance, payload: TokenPayload) {
   return app.jwt.sign(
-    { id: payload.id, email: payload.email, role: payload.role },
+    {
+      id: payload.id,
+      email: payload.email,
+      role: payload.role,
+      type: "access",
+    },
     { expiresIn: "1h" }
   );
 }
@@ -23,5 +28,8 @@ export function createRefreshToken(
   app: FastifyInstance,
   payload: RefreshTokenPayload
 ) {
-  return app.jwt.sign({ id: payload.id, tv: payload.tv }, { expiresIn: "7d" });
+  return app.jwt.sign(
+    { id: payload.id, tv: payload.tv, type: "refresh" },
+    { expiresIn: "7d" }
+  );
 }

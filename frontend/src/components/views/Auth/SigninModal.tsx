@@ -13,6 +13,7 @@ import {
   Form,
   Spinner,
 } from "@heroui/react";
+
 import { Controller } from "react-hook-form";
 import { useLogin } from "@/hooks/auth/useLogin";
 import { usePasswordVisibility } from "@/hooks/usePasswordVisibility";
@@ -54,6 +55,9 @@ export default function SigninModal({
         <Form id="login-form" onSubmit={handleSubmit(handleLogin)}>
           <ModalHeader className="flex flex-col gap-1">Sign In</ModalHeader>
           <ModalBody className="w-full">
+            {errors.root && (
+              <p className="text-red-500"> {errors.root?.message}</p>
+            )}
             <Controller
               control={control}
               name="email"
