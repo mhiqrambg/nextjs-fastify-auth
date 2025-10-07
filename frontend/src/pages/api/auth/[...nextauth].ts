@@ -69,4 +69,15 @@ export default nextAuth({
       return session;
     },
   },
+  events: {
+    async signOut({ token }: { token: JWTExtended }) {
+      if (token?.user?.accessToken) {
+        try {
+          await authService.logout(token.user.accessToken);
+        } catch (error) {
+          console.error("Error during logout:", error);
+        }
+      }
+    },
+  },
 });

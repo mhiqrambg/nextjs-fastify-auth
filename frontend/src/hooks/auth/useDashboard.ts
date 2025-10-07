@@ -1,8 +1,8 @@
-import { authService } from "@/services/auth";
+import userService from "@/services/user";
 
 export function useDashboard() {
   const dashboardService = async () => {
-    const res = await authService.dashboard();
+    const res = await userService.dashboard();
     return res;
   };
 

@@ -13,6 +13,14 @@ export const authService = {
     instance.post(endpoint.AUTH + "/resend-otp", payload),
   resetPassword: (payload: IResetPassword) =>
     instance.post(endpoint.AUTH + "/reset-password", payload),
+  logout: (token?: string) =>
+    instance.post(
+      endpoint.AUTH + "/logout",
+      {},
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      },
+    ),
 };
 
 export default authService;

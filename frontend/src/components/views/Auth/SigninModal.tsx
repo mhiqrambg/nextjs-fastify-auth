@@ -112,8 +112,15 @@ export default function SigninModal({
             </div>
           </ModalBody>
           <ModalFooter className="w-full">
-            <Button color="primary" type="submit" form="login-form">
-              {isPendingLogin ? <Spinner color="white" size="sm" /> : "Sign in"}
+            <Button
+              size="sm"
+              color="primary"
+              type="submit"
+              form="login-form"
+              isLoading={isPendingLogin}
+              disabled={isPendingLogin}
+            >
+              Sign In
             </Button>
           </ModalFooter>
         </Form>

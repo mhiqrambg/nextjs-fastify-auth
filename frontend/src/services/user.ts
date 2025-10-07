@@ -1,7 +1,7 @@
 import instance from "@/libs/axios/instance";
 import endpoint from "./endpoint.constant";
 
-const userService = {
+export const userService = {
   getProfileWithToken: (token: String) =>
     instance.get(endpoint.USER + "/me", {
       headers: { Authorization: `Bearer ${token}` },

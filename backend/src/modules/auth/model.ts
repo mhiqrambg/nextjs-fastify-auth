@@ -138,6 +138,14 @@ export const authModel = (app: FastifyInstance) => ({
 
     return result.rows[0];
   },
+
+  deleteAllRefreshTokensByUserId: async (userId: string) => {
+    const result = await app.pg.query(
+      `UPDATE refresh_tokens SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`,
+      [userId]
+    );
+    return result.rowCount;
+  },
 });
 
 export const refreshModel = (app: FastifyInstance) => ({

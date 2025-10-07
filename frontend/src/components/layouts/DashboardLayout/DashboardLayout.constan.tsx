@@ -28,6 +28,33 @@ const SIDEBAR_ADMIN = [
   },
 ];
 
+const SIDEBAR_USER = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    href: "/user",
+    icon: <LayoutGrid />,
+  },
+  {
+    key: "Class Room",
+    label: "Join Class",
+    href: "/user/class-room",
+    icon: <NotebookPen />,
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    href: "/user/profile",
+    icon: <UserRoundCog />,
+  },
+  {
+    key: "settings",
+    label: "Settings",
+    href: "/user/settings",
+    icon: <Settings />,
+  },
+];
+
 const SIDEBAR_STUDENT = [
   {
     key: "dashboard",
@@ -76,4 +103,4 @@ const SIDEBAR_TEACHER = [
   },
 ];
 
-export { SIDEBAR_ADMIN, SIDEBAR_STUDENT, SIDEBAR_TEACHER };
+export { SIDEBAR_ADMIN, SIDEBAR_STUDENT, SIDEBAR_TEACHER, SIDEBAR_USER };

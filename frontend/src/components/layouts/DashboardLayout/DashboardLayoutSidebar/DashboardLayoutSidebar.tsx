@@ -3,6 +3,8 @@ import { ArrowLeftToLine } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { cn } from "@/utils/cn";
+import { signOut } from "next-auth/react";
+import { useState } from "react";
 
 interface SidebarItem {
   key: string;
@@ -19,6 +21,20 @@ interface PropsTypes {
 const DashboardLayoutSidebar = (props: PropsTypes) => {
   const { sidebarItems, isOpen } = props;
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut({
+        callbackUrl: "/auth/signin",
+        redirect: true,
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      setIsLoggingOut(false);
+    }
+  };
   return (
     <div
       className={cn(
@@ -46,7 +62,9 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
             <ListboxItem
               key={item.key}
               className={cn("my-1 h-12 text-2xl", {
-                "bg-quiz-navy/90 text-white": item.href === router.pathname,
+                "bg-quiz-navy/90 text-white": router.pathname.startsWith(
+                  item.href,
+                ),
               })}
               startContent={item.icon}
               textValue={item.label}
@@ -64,9 +82,13 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
           fullWidth
           variant="light"
           className="flex justify-start rounded-lg px-2 py-1.5"
+          size="lg"
+          onPress={handleLogout}
+          isLoading={isLoggingOut}
+          disabled={isLoggingOut}
         >
           <ArrowLeftToLine size={18} />
-          Logout
+          {isLoggingOut ? "Logging out..." : "Logout"}
         </Button>
       </div>
     </div>

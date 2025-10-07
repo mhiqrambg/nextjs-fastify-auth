@@ -6,13 +6,14 @@ import {
   SIDEBAR_ADMIN,
   SIDEBAR_STUDENT,
   SIDEBAR_TEACHER,
+  SIDEBAR_USER,
 } from "./DashboardLayout.constan";
 import { Navbar, NavbarMenuToggle } from "@heroui/react";
 
 const DashboardLayout = (props: {
   children: React.ReactNode;
   title: string;
-  type: "student" | "teacher" | "admin";
+  type: "student" | "teacher" | "admin" | "user";
   isOpen: boolean;
 }) => {
   const { children, title, type } = props;
@@ -28,7 +29,9 @@ const DashboardLayout = (props: {
               ? SIDEBAR_STUDENT
               : type === "teacher"
                 ? SIDEBAR_TEACHER
-                : SIDEBAR_ADMIN
+                : type === "user"
+                  ? SIDEBAR_USER
+                  : SIDEBAR_ADMIN
           }
           isOpen={open}
         />

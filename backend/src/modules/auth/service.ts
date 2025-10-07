@@ -134,6 +134,11 @@ export const authService = (repo: AuthRepo) => ({
 
     return result;
   },
+
+  invalidateAllRefreshTokens: async (userId: string) => {
+    const result = await repo.deleteAllRefreshTokensByUserId(userId);
+    return result;
+  },
 });
 
 export const refreshService = (repo: RefreshRepo) => ({

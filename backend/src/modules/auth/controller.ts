@@ -111,6 +111,21 @@ export const authController = (svc: AuthService) => ({
       throw app.httpErrors.unauthorized(err.message);
     }
   },
+
+  logout: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const userId = req.user.id;
+
+    try {
+      await svc.invalidateAllRefreshTokens(userId);
+
+      reply.send({
+        message: "Logout successful",
+      });
+    } catch (err: any) {
+      throw app.httpErrors.internalServerError(err.message);
+    }
+  },
 });
 
 export const refreshController = (

@@ -27,6 +27,9 @@ export interface IVerifyOtp {
 export interface UserExtended extends User {
   accessToken?: string;
   refreshToken?: string;
+  data?: {
+    role: string;
+  };
   role?: string;
 }
 

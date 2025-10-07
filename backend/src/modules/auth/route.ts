@@ -62,6 +62,19 @@ export default async function authRoutes(app: FastifyInstance) {
     ctrl.resendOtp
   );
 
+  // logout
+  app.post(
+    "/logout",
+    {
+      preValidation: [app.auth],
+      schema: {
+        tags: ["Auth"],
+        summary: "Logout",
+      },
+    },
+    ctrl.logout
+  );
+
   // refresh token
   const refreshCtrl = refreshController(app.refreshService, app.authService);
   app.post(

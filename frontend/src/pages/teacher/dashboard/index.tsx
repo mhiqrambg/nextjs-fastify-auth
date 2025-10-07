@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 
-const DashboardMemberPage = () => {
+const DashboardTeacher = () => {
   return (
     <DashboardLayout title="Teacher" type="teacher" isOpen={true}>
       <h1>Teacher page</h1>
@@ -8,4 +8,4 @@ const DashboardMemberPage = () => {
   );
 };
 
-export default DashboardMemberPage;
+export default DashboardTeacher;
