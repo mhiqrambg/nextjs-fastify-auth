@@ -139,19 +139,35 @@ export const authModel = (app: FastifyInstance) => ({
     return result.rows[0];
   },
 
-  deleteAllRefreshTokensByUserId: async (userId: string) => {
-    const result = await app.pg.query(
-      `UPDATE refresh_tokens SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`,
-      [userId]
+  findRefreshToken: async (tokenHint: string) => {
+    const { rows } = await app.pg.query(
+      `SELECT rt.id as refresh_token_id, u.id, rt.user_id, rt.token_hash, rt.expires_at, rt.revoked_at,
+              u.email, u.role, u.tv
+         FROM refresh_tokens rt
+         JOIN users u ON u.id = rt.user_id
+        WHERE rt.token_hint = $1
+          AND rt.revoked_at IS NULL
+          AND rt.expires_at > now()
+        FOR UPDATE`,
+      [tokenHint]
     );
-    return result.rowCount;
+
+    return rows[0] ?? null;
+  },
+
+  revokeRefreshToken: async (id: string) => {
+    const { rows } = await app.pg.query(
+      `UPDATE refresh_tokens SET revoked_at = now() WHERE id = $1 RETURNING id, revoked_at`,
+      [id]
+    );
+    return rows[0] ?? null;
   },
 });
 
 export const refreshModel = (app: FastifyInstance) => ({
   findRefreshToken: async (tokenHint: string) => {
     const { rows } = await app.pg.query(
-      `SELECT rt.id, rt.user_id, rt.token_hash, rt.expires_at, rt.revoked_at,
+      `SELECT rt.id as refresh_token_id, u.id, rt.user_id, rt.token_hash, rt.expires_at, rt.revoked_at,
               u.email, u.role, u.tv
          FROM refresh_tokens rt
          JOIN users u ON u.id = rt.user_id

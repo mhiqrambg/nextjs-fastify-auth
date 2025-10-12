@@ -135,9 +135,18 @@ export const authService = (repo: AuthRepo) => ({
     return result;
   },
 
-  invalidateAllRefreshTokens: async (userId: string) => {
-    const result = await repo.deleteAllRefreshTokensByUserId(userId);
-    return result;
+  revokeRefreshToken: async (refreshToken: string) => {
+    const tokenHint = sha256(refreshToken);
+    const result = await repo.findRefreshToken(tokenHint);
+    if (!result) throw new Error("Invalid refresh token");
+
+    const verified = await verifyRefresh(result.token_hash, refreshToken);
+    if (!verified) throw new Error("Invalid refresh token");
+
+    const updated = await repo.revokeRefreshToken(result.refresh_token_id);
+    if (!updated) throw new Error("Failed to revoke refresh token");
+
+    return updated;
   },
 });
 
@@ -146,16 +155,11 @@ export const refreshService = (repo: RefreshRepo) => ({
     const tokenHint = sha256(refreshToken);
     const result = await repo.findRefreshToken(tokenHint);
 
-    if (!result) {
-      throw new Error("Invalid refresh token");
-    }
+    if (!result) throw new Error("Invalid refresh token");
 
     // Verifikasi token
     const match = await verifyRefresh(result.token_hash, refreshToken);
-
-    if (!match) {
-      throw new Error("Invalid refresh token");
-    }
+    if (!match) throw new Error("Invalid refresh token");
 
     return result;
   },

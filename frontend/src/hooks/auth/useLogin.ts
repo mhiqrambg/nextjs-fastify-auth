@@ -15,7 +15,7 @@ const LoginSchema = yup.object().shape({
     .min(5, "Password must be at least 5 characters"),
 });
 
-export function useLogin() {
+export function useLogin({ onSuccessClose }: { onSuccessClose?: () => void }) {
   const router = useRouter();
   const {
     control,
@@ -44,8 +44,9 @@ export function useLogin() {
   const { mutate: mutateLogin, isPending: isPendingLogin } = useMutation({
     mutationFn: loginService,
     onSuccess: async () => {
-      router.push(callbackUrl);
+      onSuccessClose?.();
       reset();
+      await router.push(callbackUrl);
     },
     onError: (err: any) => {
       const message = extractErrorMessage(err);

@@ -11,7 +11,6 @@ import {
   Link,
   ModalProps,
   Form,
-  Spinner,
 } from "@heroui/react";
 
 import { Controller } from "react-hook-form";
@@ -33,7 +32,7 @@ export default function SigninModal({
   isClose,
 }: SigninModalProps) {
   const { handleLogin, isPendingLogin, control, errors, handleSubmit } =
-    useLogin();
+    useLogin({ onSuccessClose: isClose });
   const { visibility, toggleVisibility } = usePasswordVisibility(["password"]);
 
   const handleOpenReset = () => {

@@ -20,7 +20,7 @@ export function createAccessToken(app: FastifyInstance, payload: TokenPayload) {
       role: payload.role,
       type: "access",
     },
-    { expiresIn: "1h" }
+    { expiresIn: "1m" }
   );
 }
 

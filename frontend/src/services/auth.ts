@@ -13,13 +13,17 @@ export const authService = {
     instance.post(endpoint.AUTH + "/resend-otp", payload),
   resetPassword: (payload: IResetPassword) =>
     instance.post(endpoint.AUTH + "/reset-password", payload),
-  logout: (token?: string) =>
+  refreshToken: (refreshToken: string) =>
+    instance.post(
+      endpoint.AUTH + "/refresh",
+      { refreshToken },
+      { skipAuth: true },
+    ),
+  logout: (refreshToken: string) =>
     instance.post(
       endpoint.AUTH + "/logout",
-      {},
-      {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      },
+      { refreshToken },
+      { skipAuth: true },
     ),
 };
 

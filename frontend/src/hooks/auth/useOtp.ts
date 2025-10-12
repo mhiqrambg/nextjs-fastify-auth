@@ -69,8 +69,6 @@ export default function useOtp() {
       return;
     }
 
-    console.log("user", user);
-
     mutateOtp({
       ...data,
       id: user?.id || "",

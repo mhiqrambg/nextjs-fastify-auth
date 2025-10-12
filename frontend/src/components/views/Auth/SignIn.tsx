@@ -8,7 +8,6 @@ import {
   Button,
   Input,
   Form,
-  Spinner,
 } from "@heroui/react";
 
 import { usePasswordVisibility } from "@/hooks/usePasswordVisibility";
@@ -21,7 +20,7 @@ export default function SignIn() {
   const { visibility, toggleVisibility } = usePasswordVisibility(["password"]);
 
   const { handleLogin, control, errors, handleSubmit, isPendingLogin } =
-    useLogin();
+    useLogin({ onSuccessClose: () => {} });
 
   return (
     <div className="flex min-h-screen items-center justify-center">

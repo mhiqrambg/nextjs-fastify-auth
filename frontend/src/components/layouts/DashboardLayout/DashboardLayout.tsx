@@ -53,7 +53,7 @@ const DashboardLayout = (props: {
               <p className="text-2xl font-bold">Menu</p>
             </NavbarMenuToggle>
           </Navbar>
-          {children}
+          <div className="flex flex-col gap-6">{children}</div>
         </div>
       </div>
     </>

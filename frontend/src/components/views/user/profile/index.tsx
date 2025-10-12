@@ -1,7 +1,3 @@
-export default function ProfileView() {
-  return (
-    <div className="min-h-screen bg-amber-700">
-      <h1>Profiles</h1>
-    </div>
-  );
-}
+import ProfileView from "./Profile";
+
+export { ProfileView };

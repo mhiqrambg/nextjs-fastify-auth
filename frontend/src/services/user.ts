@@ -2,9 +2,13 @@ import instance from "@/libs/axios/instance";
 import endpoint from "./endpoint.constant";
 
 export const userService = {
-  getProfileWithToken: (token: String) =>
+  getProfile: () => instance.get(endpoint.USER + "/me"),
+  getProfileWithToken: (token: string) =>
     instance.get(endpoint.USER + "/me", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      skipAuth: true,
     }),
   dashboard: () => instance.get(endpoint.USER + "/dashboard"),
 };

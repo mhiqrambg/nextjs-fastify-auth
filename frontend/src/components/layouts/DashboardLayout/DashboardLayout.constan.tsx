@@ -32,25 +32,25 @@ const SIDEBAR_USER = [
   {
     key: "dashboard",
     label: "Dashboard",
-    href: "/user",
+    href: "/dashboard/user",
     icon: <LayoutGrid />,
   },
   {
     key: "Class Room",
-    label: "Join Class",
-    href: "/user/class-room",
+    label: "Class Room",
+    href: "/dashboard/user/class-room",
     icon: <NotebookPen />,
   },
   {
     key: "profile",
     label: "Profile",
-    href: "/user/profile",
+    href: "/dashboard/user/profile",
     icon: <UserRoundCog />,
   },
   {
     key: "settings",
     label: "Settings",
-    href: "/user/settings",
+    href: "/dashboard/user/settings",
     icon: <Settings />,
   },
 ];

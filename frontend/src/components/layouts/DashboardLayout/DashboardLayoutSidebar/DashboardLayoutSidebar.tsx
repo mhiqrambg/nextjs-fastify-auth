@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { cn } from "@/utils/cn";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 
 interface SidebarItem {
   key: string;
@@ -38,7 +39,7 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
   return (
     <div
       className={cn(
-        "border-default-200 fixed z-50 flex h-screen w-full max-w-[300px] -translate-x-full flex-col justify-between border-r-1 bg-white p-4 transition-all lg:relative lg:translate-x-0",
+        "border-default-200 fixed z-50 flex h-screen w-full max-w-[250px] -translate-x-full flex-col justify-between border-r-1 bg-white p-4 transition-all lg:relative lg:translate-x-0",
         { "translate-x-0": isOpen },
       )}
     >
@@ -70,6 +71,8 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
               textValue={item.label}
               aria-labelledby={item.label}
               aria-describedby={item.label}
+              as={Link as any}
+              href={item.href}
             >
               <p>{item.label}</p>
             </ListboxItem>

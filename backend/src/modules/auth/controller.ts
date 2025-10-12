@@ -114,10 +114,11 @@ export const authController = (svc: AuthService) => ({
 
   logout: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
-    const userId = req.user.id;
+
+    const { refreshToken } = RefreshTokenSchema.parse(req.body);
 
     try {
-      await svc.invalidateAllRefreshTokens(userId);
+      await svc.revokeRefreshToken(refreshToken);
 
       reply.send({
         message: "Logout successful",

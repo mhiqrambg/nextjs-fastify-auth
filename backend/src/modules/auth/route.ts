@@ -66,7 +66,6 @@ export default async function authRoutes(app: FastifyInstance) {
   app.post(
     "/logout",
     {
-      preValidation: [app.auth],
       schema: {
         tags: ["Auth"],
         summary: "Logout",

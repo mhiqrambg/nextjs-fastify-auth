@@ -1,9 +1,11 @@
-import NextAuth from "next-auth";
+import type { DefaultUser, DefaultSession } from "next-auth";
+import { UserExtended } from "@/types/Auth";
 
 declare module "next-auth" {
   interface Session {
     accessToken?: string;
     refreshToken?: string;
+    user: UserExtended;
   }
 
   interface User {

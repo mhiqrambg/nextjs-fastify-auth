@@ -2,7 +2,7 @@ import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import SignIn from "@/components/views/auth/SignIn";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 export default function Signin() {
   return (
@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     return {
       redirect: {
-        destination: "/user/dashboard",
+        destination: "/dashboard",
         permanent: false,
       },
     };
