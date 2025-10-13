@@ -74,7 +74,7 @@ export default function PaginationControls({
         className={cn(
           itemClass,
           isActive &&
-            "to-quiz-navy bg-linear-to-br from-red-200 font-bold text-white",
+            "to-primary-400 from-primary-200 bg-linear-to-br font-bold text-white",
         )}
         onClick={() => onChange(value)}
       >

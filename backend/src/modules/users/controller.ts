@@ -38,8 +38,8 @@ export const usersController = (svc: UsersService) => ({
 
   update: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
+    const { id } = req.user;
 
-    const { id } = UpdateUserParams.parse(req.params);
     const body = UpdateUserBody.parse(req.body);
 
     try {
@@ -93,6 +93,8 @@ export const usersController = (svc: UsersService) => ({
     const app = req.server;
     const { id } = req.user;
 
+    console.log("id", "asdasd");
+
     try {
       const user = await svc.findUser(id);
       if (!user) {
@@ -102,6 +104,7 @@ export const usersController = (svc: UsersService) => ({
       return reply.send({ message: "success", data: user });
     } catch (err: any) {
       req.log.error(err);
+
       throw err;
     }
   },

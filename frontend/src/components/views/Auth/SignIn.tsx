@@ -50,7 +50,7 @@ export default function SignIn() {
                     placeholder="Enter your email"
                     type="email"
                     variant="bordered"
-                    autoComplete="off"
+                    autoComplete="email"
                     onClear={() => {}}
                     isInvalid={!!errors.email}
                     errorMessage={errors.email?.message}
@@ -63,7 +63,7 @@ export default function SignIn() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    autoComplete="off"
+                    autoComplete="current-password"
                     endContent={
                       <button
                         aria-label="toggle password visibility"

@@ -69,6 +69,7 @@ export default function SigninModal({
                   className="text-base"
                   isInvalid={!!errors.email}
                   errorMessage={errors.email?.message}
+                  autoComplete="email"
                 />
               )}
             />
@@ -85,6 +86,7 @@ export default function SigninModal({
                   className="text-base"
                   isInvalid={!!errors.password}
                   errorMessage={errors.password?.message}
+                  autoComplete="current-password"
                   endContent={
                     <Button
                       isIconOnly

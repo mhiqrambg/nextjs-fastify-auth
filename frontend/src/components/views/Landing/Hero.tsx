@@ -87,6 +87,7 @@ export default function Hero() {
             className="h-auto w-full sm:w-56 md:h-auto md:w-80 lg:w-[500px]"
             width={500}
             height={500}
+            style={{ width: "auto", height: "auto" }}
           />
         </div>
       </div>

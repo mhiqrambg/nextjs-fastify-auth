@@ -70,7 +70,6 @@ export const authOptions: NextAuthOptions = {
       session: SessionExtended;
       token: JWTExtended & { refreshToken?: string };
     }) {
-      // kalau token.user masih wrapper (edge case), flatten lagi
       const flatUser = (token.user as any)?.data
         ? (token.user as any).data
         : token.user;

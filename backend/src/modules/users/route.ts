@@ -43,10 +43,10 @@ export default async function usersRoutes(app: FastifyInstance) {
     ctrl.delete
   );
   app.put(
-    "/:id",
+    "/",
     {
+      preValidation: [app.auth],
       schema: {
-        params: ParamsUserSchemaJSON,
         tags: ["Users"],
         summary: "Update user",
       },

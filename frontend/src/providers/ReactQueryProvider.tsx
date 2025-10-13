@@ -7,7 +7,24 @@ export function ReactQueryProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false, // Disable auto-refetch on window focus
+            refetchOnReconnect: false, // Disable auto-refetch on reconnect
+            retry: (failureCount, error: any) => {
+              // Don't retry on 401 errors globally
+              if (error?.response?.status === 401) {
+                return false;
+              }
+              return failureCount < 2;
+            },
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

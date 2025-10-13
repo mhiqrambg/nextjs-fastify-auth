@@ -92,7 +92,14 @@ export default function App({
       <NavbarContent className="pr-3 sm:hidden" justify="center">
         <NavbarBrand>
           <NextLink href="/" aria-label="Quizolah Home">
-            <Image src="/logo.png" alt="Quizolah" width={100} height={100} />
+            <Image
+              src="/logo.png"
+              alt="Quizolah"
+              width={100}
+              height={100}
+              priority
+              style={{ width: "auto", height: "auto" }}
+            />
           </NextLink>
         </NavbarBrand>
       </NavbarContent>
@@ -101,7 +108,14 @@ export default function App({
       <NavbarContent className="hidden sm:flex" justify="center">
         <NavbarBrand>
           <NextLink href="/" aria-label="Quizolah Home">
-            <Image src="/logo.png" alt="Quizolah" width={100} height={100} />
+            <Image
+              src="/logo.png"
+              alt="Quizolah"
+              width={100}
+              height={100}
+              priority
+              style={{ width: "auto", height: "auto" }}
+            />
           </NextLink>
         </NavbarBrand>
 

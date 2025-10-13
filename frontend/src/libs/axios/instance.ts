@@ -2,11 +2,13 @@ import axios, { AxiosRequestHeaders, InternalAxiosRequestConfig } from "axios";
 import environment from "@/config/environment";
 import { getSession, signOut } from "next-auth/react";
 import { SessionExtended } from "@/types/Auth";
-import authService from "@/services/auth"; // default import, konsisten
+import authService from "@/services/auth";
 import {
   getAccessTokenOverride,
   setAccessTokenOverride,
+  clearAccessTokenOverride,
 } from "@/services/tokenStore";
+import { isTokenExpired } from "@/utils/jwt";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   skipAuth?: boolean;
@@ -24,15 +26,23 @@ instance.interceptors.request.use(
     request.headers = (request.headers || {}) as AxiosRequestHeaders;
 
     if (!request.skipAuth) {
-      // 1) Pakai token override jika ada (hasil refresh terbaru)
       const override = getAccessTokenOverride();
+
+      // Use override token ONLY if it's not expired
       if (override) {
-        request.headers.Authorization = `Bearer ${override}`;
-        return request;
+        if (isTokenExpired(override)) {
+          console.log(
+            "🧹 Override token expired - clearing and using session token",
+          );
+          clearAccessTokenOverride();
+        } else {
+          request.headers.Authorization = `Bearer ${override}`;
+          return request;
+        }
       }
 
-      // 2) Fallback ke NextAuth session
       const session: SessionExtended | null = await getSession();
+
       if (session?.accessToken) {
         request.headers.Authorization = `Bearer ${session.accessToken}`;
       }
@@ -40,7 +50,10 @@ instance.interceptors.request.use(
 
     return request;
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    console.error("❌ REQUEST INTERCEPTOR ERROR:", error);
+    return Promise.reject(error);
+  },
 );
 
 let isRefreshing = false;
@@ -54,25 +67,30 @@ instance.interceptors.response.use(
 
     if (!original) return Promise.reject(error);
 
-    // Guard: jangan refresh untuk endpoint refresh agar tak loop
     const url = (original.url || "").toString();
     if (url.includes("/auth/refresh")) {
       return Promise.reject(error);
     }
 
-    // Jika bukan 401 atau sudah _retry → lempar error
     if (status !== 401 || original._retry) {
       return Promise.reject(error);
     }
+
+    // Reactive token refresh on 401 error
     original._retry = true;
 
+    console.log(
+      `🔄 401 Error detected on ${url} - attempting token refresh...`,
+    );
+
     try {
-      // Jika sedang refresh, antre sampai selesai
       if (isRefreshing) {
+        console.log("⏳ Refresh already in progress, queuing request...");
         const newToken = await new Promise<string | null>((resolve) =>
           refreshQueue.push(resolve),
         );
         if (newToken) {
+          console.log("✅ Queued request retrying with new token");
           original.headers = original.headers || {};
           (original.headers as any).Authorization = `Bearer ${newToken}`;
           return instance(original);
@@ -82,41 +100,40 @@ instance.interceptors.response.use(
 
       isRefreshing = true;
 
-      // Ambil refreshToken dari Session
       const session: SessionExtended | null = await getSession();
       const refreshToken = session?.refreshToken;
+
       if (!refreshToken) throw new Error("Missing refresh token");
 
-      // Panggil refresh (tanpa Bearer)
+      console.log("🔑 Refreshing access token...");
+      const startTime = Date.now();
       const res = await authService.refreshToken(refreshToken);
-      console.log("res", res);
-
-      // Amankan parsing sesuai backend kamu
+      const duration = Date.now() - startTime;
       const newAccessToken = res?.data?.accessToken;
 
       if (!newAccessToken) throw new Error("Failed to refresh token");
 
-      // Simpan override agar request berikutnya otomatis pakai token baru
+      // Save to sessionStorage so it persists for all future requests
       setAccessTokenOverride(newAccessToken);
+      console.log(`✅ Token refreshed successfully in ${duration}ms`);
 
-      // Update header request yang gagal & retry
       original.headers = original.headers || {};
       (original.headers as any).Authorization = `Bearer ${newAccessToken}`;
 
-      // Bangunkan antrean
       refreshQueue.forEach((resolve) => resolve(newAccessToken));
       refreshQueue = [];
       isRefreshing = false;
 
+      console.log(`🔁 Retrying original request to ${url}`);
       return instance(original);
     } catch (err) {
-      // Gagalkan antrean dan keluar
+      console.error("❌ Token refresh failed:", err);
       refreshQueue.forEach((resolve) => resolve(null));
       refreshQueue = [];
       isRefreshing = false;
 
-      // Bersihkan override & paksa signOut
       setAccessTokenOverride(null);
+      console.log("🚪 Signing out user due to refresh failure");
       await signOut({ redirect: true });
       return Promise.reject(err);
     }

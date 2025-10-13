@@ -11,6 +11,10 @@ export const userService = {
       skipAuth: true,
     }),
   dashboard: () => instance.get(endpoint.USER + "/dashboard"),
+  updateUser: (payload: { name: string }) =>
+    instance.put(endpoint.USER + "/", payload),
+  updatePassword: (payload: { password: string }) =>
+    instance.put(endpoint.USER + "/password", payload),
 };
 
 export default userService;

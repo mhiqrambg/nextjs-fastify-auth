@@ -329,7 +329,7 @@ const MyClass = () => {
     },
   ];
 
-  const { page, setPage, totalPages, next, prev, slice } = usePagination({
+  const { slice } = usePagination({
     pageSize: 4,
     totalItems: list.length,
   });
@@ -338,7 +338,10 @@ const MyClass = () => {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">My Class</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="mb-4 text-xl font-bold">My Class</h1>
+        <p className="text-primary">View all</p>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {visible.map((item) => (

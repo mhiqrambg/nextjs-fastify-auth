@@ -13,6 +13,17 @@ export interface Profile {
   email_verified_at: string | null;
 }
 
+export interface ProfileForm {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  re_password: string;
+  phone_number: string;
+  phone_verified_at: string | null;
+  email_verified_at: string | null;
+}
+
 export interface ApiResponse<T> {
   message: string;
   data: T;

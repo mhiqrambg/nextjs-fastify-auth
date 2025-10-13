@@ -46,11 +46,10 @@ export default function useOtp() {
     mutationFn: otpService,
     onSuccess: (res) => {
       reset();
-      console.log("res", res);
+
       setIsSuccess(true);
     },
     onError: (err: any) => {
-      console.log("error", err);
       const message =
         err?.response?.data?.message || err.message || "Something went wrong";
       setError("root", { message });
@@ -64,7 +63,6 @@ export default function useOtp() {
 
   const handleOtp = (data: OtpFormData) => {
     if (!user?.id || !user?.phone_number) {
-      console.log("tidak ada user");
       setError("root", { message: "User data is missing. Please try again." });
       return;
     }

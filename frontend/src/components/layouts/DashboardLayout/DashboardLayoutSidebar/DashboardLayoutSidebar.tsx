@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { cn } from "@/utils/cn";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-import Link from "next/link";
 
 interface SidebarItem {
   key: string;
@@ -52,6 +51,7 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
             height={60}
             className="mb-6 w-32"
             onClick={() => router.push("/")}
+            priority
           />
         </div>
         <Listbox
@@ -59,24 +59,26 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
           variant="solid"
           aria-label="Dashboard Menu"
         >
-          {(item) => (
-            <ListboxItem
-              key={item.key}
-              className={cn("my-1 h-12 text-2xl", {
-                "bg-quiz-navy/90 text-white": router.pathname.startsWith(
-                  item.href,
-                ),
-              })}
-              startContent={item.icon}
-              textValue={item.label}
-              aria-labelledby={item.label}
-              aria-describedby={item.label}
-              as={Link as any}
-              href={item.href}
-            >
-              <p>{item.label}</p>
-            </ListboxItem>
-          )}
+          {(item) => {
+            // Check if current route is active
+            // Use exact match to prevent parent routes from highlighting
+            const isActive = router.pathname === item.href;
+
+            return (
+              <ListboxItem
+                key={item.key}
+                className={cn("my-1 h-12 text-2xl", {
+                  "bg-quiz-navy/90 text-white": isActive,
+                })}
+                startContent={item.icon}
+                textValue={item.label}
+                aria-label={item.label}
+                onPress={() => router.push(item.href)}
+              >
+                <p>{item.label}</p>
+              </ListboxItem>
+            );
+          }}
         </Listbox>
       </div>
       <div className="p1 flex items-center">
