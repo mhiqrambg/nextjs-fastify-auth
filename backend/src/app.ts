@@ -12,6 +12,8 @@ import jwtPlugin from "./plugins/jwt";
 import db from "./plugins/db";
 import users from "./plugins/users";
 import auth from "./plugins/auth";
+import exams from "./plugins/exams";
+import classrooms from "./plugins/classrooms";
 import errorHandler from "./plugins/errorHandler";
 import opsRoute from "./modules/routes/ops";
 
@@ -22,6 +24,8 @@ import { registerRefreshCleanup } from "./jobs/cleanup-refresh-tokens";
 import healthRoute from "./modules/health/route";
 import usersRoute from "./modules/users/route";
 import authRoute from "./modules/auth/route";
+import examsRoute from "./modules/exams/route";
+import classroomsRoute from "./modules/classrooms/route";
 
 export function buildApp(opts: FastifyServerOptions = {}) {
   const app = Fastify({
@@ -37,6 +41,8 @@ export function buildApp(opts: FastifyServerOptions = {}) {
   app.register(jwtPlugin);
   app.register(db);
   app.register(users);
+  app.register(exams);
+  app.register(classrooms);
   app.register(auth);
   app.register(errorHandler);
   app.register(opsRoute);
@@ -51,6 +57,8 @@ export function buildApp(opts: FastifyServerOptions = {}) {
   app.register(healthRoute, { prefix: "/health" });
   app.register(usersRoute, { prefix: "/user" });
   app.register(authRoute, { prefix: "/auth" });
+  app.register(examsRoute, { prefix: "/exams" });
+  app.register(classroomsRoute, { prefix: "/classrooms" });
 
   return app;
 }

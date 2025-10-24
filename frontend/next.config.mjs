@@ -13,6 +13,9 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    allowedDevOrigins: ["https://bef8c4891487.ngrok-free.app"],
+  },
 };
 
 export default nextConfig;

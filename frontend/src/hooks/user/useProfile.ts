@@ -7,7 +7,6 @@ export function useProfile() {
   const { data: session, status } = useSession();
   const [isMounted, setIsMounted] = useState(false);
 
-  // Only enable query after component is mounted on client
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -23,7 +22,6 @@ export function useProfile() {
     staleTime: 1000 * 60 * 5,
     enabled: isEnabled,
     retry: (failureCount, error: any) => {
-      // Don't retry on 401 errors
       if (error?.response?.status === 401) {
         return false;
       }

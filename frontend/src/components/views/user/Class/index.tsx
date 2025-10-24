@@ -1,4 +1,3 @@
-import MyClass from "./Class";
-import JoinClass from "./JoinClass";
+import Class from "./Class";
 
-export { MyClass, JoinClass };
+export { Class };

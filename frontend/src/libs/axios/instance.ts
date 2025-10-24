@@ -28,7 +28,6 @@ instance.interceptors.request.use(
     if (!request.skipAuth) {
       const override = getAccessTokenOverride();
 
-      // Use override token ONLY if it's not expired
       if (override) {
         if (isTokenExpired(override)) {
           console.log(

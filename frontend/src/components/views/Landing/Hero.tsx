@@ -71,6 +71,7 @@ export default function Hero() {
                 isLoading={isLoading}
                 type="submit"
                 size="sm"
+                isDisabled
               >
                 Start Exam
               </Button>

@@ -10,6 +10,7 @@ declare module "@fastify/jwt" {
       role: string;
       email: string;
       type: string;
+      tv?: number;
     };
   }
 }
@@ -25,6 +26,7 @@ declare module "fastify" {
       role: string;
       email: string;
       type: string;
+      tv?: number;
     };
   }
 }
@@ -39,7 +41,7 @@ export default fp(async (app) => {
       if (request.user.type !== "access") {
         return reply.code(401).send({ error: "Unauthorized" });
       }
-    } catch (err) {
+    } catch (err: any) {
       return reply.code(401).send({ error: "Unauthorized" });
     }
   });

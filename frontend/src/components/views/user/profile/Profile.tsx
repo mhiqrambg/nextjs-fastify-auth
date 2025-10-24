@@ -30,14 +30,13 @@ function formatDate(iso?: string | null) {
 
 const ProfileView = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { data, isLoading, isError, error, refetch, isFetching } = useProfile();
   const user = data?.data;
 
   const levels = ["rookie", "beginner", "intermediate", "advanced", "expert"];
   const level = levels[Math.floor(Math.random() * levels.length)];
 
-  // Check if user is authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin");
@@ -53,14 +52,14 @@ const ProfileView = () => {
         </CardHeader>
 
         <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Input label="Name" value={user?.name || ""} readOnly />
-          <Input label="Email" value={user?.email || ""} readOnly />
+          <Input label="Name" value={user?.name ?? "-"} isReadOnly />
+          <Input label="Email" value={user?.email ?? "-"} isReadOnly />
 
           <Input
             name="phone_number"
             label="Phone Number"
-            value={user?.phone_number || ""}
-            readOnly
+            value={user?.phone_number ?? "-"}
+            isReadOnly
             isDisabled
             placeholder="-"
             endContent={
@@ -74,13 +73,13 @@ const ProfileView = () => {
 
           <Input
             label="Created"
-            value={formatDate(user?.created_at) || ""}
-            readOnly
+            value={formatDate(user?.created_at)}
+            isReadOnly
           />
           <Input
             label="Updated"
-            value={formatDate(user?.updated_at) || ""}
-            readOnly
+            value={formatDate(user?.updated_at)}
+            isReadOnly
           />
 
           <div className="flex gap-2 pt-2 md:col-span-2">
@@ -148,6 +147,10 @@ const ProfileView = () => {
     [user, isFetching],
   );
 
+  if (status === "unauthenticated") {
+    return null;
+  }
+
   if (status === "loading" || isLoading) {
     return (
       <div className="flex h-screen items-center justify-center gap-2">
@@ -163,7 +166,6 @@ const ProfileView = () => {
       (error as Error)?.message ||
       "An error occurred while loading the data.";
 
-    // Handle 401 Unauthorized error - redirect to login
     if (errorStatus === 401) {
       return (
         <div className="max-w-xl">
@@ -204,10 +206,11 @@ const ProfileView = () => {
           src={
             user?.profile_image ? user?.profile_image : "/images/user/user.svg"
           }
-          className="text-large h-25 w-25"
+          alt={user?.name ?? "User avatar"}
+          className="h-24 w-24"
         />
         <div className="flex flex-col items-start justify-center gap-2">
-          <p className="text-xl font-semibold capitalize">Muh. Iqram Bahring</p>
+          <p className="text-xl font-semibold capitalize">{user?.name}</p>
           <p className="text-foreground/60 text-sm">{user?.email}</p>
           <p className="rounded-full bg-[#14A7A0] px-2 py-1 text-sm text-white uppercase">
             {level}

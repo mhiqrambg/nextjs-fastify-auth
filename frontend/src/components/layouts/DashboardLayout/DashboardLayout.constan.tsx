@@ -5,6 +5,8 @@ import {
   NotebookPen,
   Users,
   GraduationCap,
+  Book,
+  School,
 } from "lucide-react";
 
 const SIDEBAR_ADMIN = [
@@ -39,6 +41,12 @@ const SIDEBAR_USER = [
     key: "Class Room",
     label: "Class Room",
     href: "/dashboard/user/class-room",
+    icon: <School />,
+  },
+  {
+    key: "My Exam",
+    label: "My Exam",
+    href: "/dashboard/user/exam",
     icon: <NotebookPen />,
   },
   {
@@ -59,13 +67,13 @@ const SIDEBAR_STUDENT = [
   {
     key: "dashboard",
     label: "Dashboard",
-    href: "/student",
+    href: "/dashboard/student",
     icon: <LayoutGrid />,
   },
   {
     key: "profile",
     label: "Profile",
-    href: "/student/profile",
+    href: "/dashboard/student/profile",
     icon: <UserRoundCog />,
   },
   {
@@ -80,25 +88,31 @@ const SIDEBAR_TEACHER = [
   {
     key: "dashboard",
     label: "Dashboard",
-    href: "/teacher",
+    href: "/dashboard/teacher",
     icon: <LayoutGrid />,
   },
   {
-    key: "student",
-    label: "Student",
-    href: "/teacher/student",
-    icon: <Users />,
+    key: "Class Room",
+    label: "Class Room",
+    href: "/dashboard/teacher/class-room",
+    icon: <School />,
   },
   {
-    key: "exam",
-    label: "Exam",
-    href: "/teacher/exam",
+    key: "My Exam",
+    label: "My Exam",
+    href: "/dashboard/teacher/exam",
     icon: <NotebookPen />,
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    href: "/dashboard/teacher/profile",
+    icon: <GraduationCap />,
   },
   {
     key: "settings",
     label: "Settings",
-    href: "/teacher/settings",
+    href: "/dashboard/teacher/settings",
     icon: <Settings />,
   },
 ];

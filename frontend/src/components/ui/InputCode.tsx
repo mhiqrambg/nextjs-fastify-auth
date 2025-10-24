@@ -4,7 +4,6 @@ import { Alert, Button, Input, Spinner, Form } from "@heroui/react";
 import { Plus, X } from "lucide-react";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { div } from "framer-motion/client";
 
 const CustomAlert = ({
   children,
@@ -44,8 +43,21 @@ const CustomAlert = ({
 
 CustomAlert.displayName = "CustomAlert";
 
-const JoinClass = () => {
+const InputCode = ({
+  title,
+  description,
+  buttonText,
+  buttonInputText,
+  placeholder,
+}: {
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonInputText: string;
+  placeholder: string;
+}) => {
   const [showInput, setShowInput] = React.useState(false);
+
   const [classCode, setClassCode] = React.useState("");
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,13 +65,9 @@ const JoinClass = () => {
   };
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Join Class</h1>
+      <h1 className="text-xl font-semibold">{title}</h1>
       <div className="flex w-full flex-col gap-y-6">
-        <CustomAlert
-          key="warning"
-          color="warning"
-          description="You have a class code. Please enter it to join the class."
-        >
+        <CustomAlert key="warning" color="warning" description={description}>
           <div className="mt-3 flex items-center gap-1">
             {!showInput ? (
               <div className="flex items-center gap-2">
@@ -71,7 +79,7 @@ const JoinClass = () => {
                   onPress={() => setShowInput(true)}
                   startContent={<Plus size={16} />}
                 >
-                  Input Class Code
+                  {buttonInputText}
                 </Button>
               </div>
             ) : (
@@ -95,7 +103,7 @@ const JoinClass = () => {
                 >
                   <Form onSubmit={handleSubmit} className="flex flex-row gap-2">
                     <Input
-                      placeholder="Enter class code"
+                      placeholder={placeholder}
                       value={classCode}
                       onChange={(e) => {
                         let val = e.target.value.toUpperCase();
@@ -110,7 +118,7 @@ const JoinClass = () => {
                     />
 
                     <Button color="primary" type="submit" size="sm">
-                      Join
+                      {buttonText}
                     </Button>
                   </Form>
                 </motion.div>
@@ -123,4 +131,4 @@ const JoinClass = () => {
   );
 };
 
-export default JoinClass;
+export default InputCode;

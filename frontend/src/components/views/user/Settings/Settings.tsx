@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useProfile } from "@/hooks/user/useProfile";
 import { Button, Spinner, Alert, Avatar } from "@heroui/react";
 import { Book, UserIcon, LockKeyhole } from "lucide-react";
@@ -26,7 +26,7 @@ function deriveLevel(userId?: string) {
 
 const Setting = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { data, isLoading, isError, error, refetch, isFetching } = useProfile();
   const user = data?.data;
 
@@ -41,18 +41,28 @@ const Setting = () => {
     email_verified_at: null,
   });
 
-  // Check if user is authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin");
     }
   }, [status, router]);
 
-  const lastSyncedId = useRef<string | null>(null);
+  const lastSyncedFingerprint = useRef<string | null>(null);
+
   useEffect(() => {
     if (!user) return;
-    if (lastSyncedId.current === user.id) return;
-    lastSyncedId.current = user.id ?? null;
+
+    const fingerprint = JSON.stringify({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone_number: user.phone_number,
+      phone_verified_at: user.phone_verified_at,
+      email_verified_at: user.email_verified_at,
+    });
+
+    if (lastSyncedFingerprint.current === fingerprint) return;
+    lastSyncedFingerprint.current = fingerprint;
 
     setFormUser({
       id: user.id ?? "",
@@ -107,7 +117,6 @@ const Setting = () => {
       (error as Error)?.message ||
       "An error occurred while loading the data.";
 
-    // Handle 401 Unauthorized error - redirect to login
     if (errorStatus === 401) {
       return (
         <div className="max-w-xl">

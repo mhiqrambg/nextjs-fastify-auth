@@ -14,7 +14,7 @@ export const userService = {
   updateUser: (payload: { name: string }) =>
     instance.put(endpoint.USER + "/", payload),
   updatePassword: (payload: { password: string }) =>
-    instance.put(endpoint.USER + "/password", payload),
+    instance.put(endpoint.USER + "/", payload),
 };
 
 export default userService;

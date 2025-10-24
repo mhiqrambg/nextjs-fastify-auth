@@ -93,8 +93,6 @@ export const usersController = (svc: UsersService) => ({
     const app = req.server;
     const { id } = req.user;
 
-    console.log("id", "asdasd");
-
     try {
       const user = await svc.findUser(id);
       if (!user) {

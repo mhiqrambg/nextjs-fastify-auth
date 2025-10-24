@@ -1,5 +1,4 @@
 import { Tabs, Tab } from "@heroui/react";
-import { ImageIcon, Music2Icon, VideoIcon } from "lucide-react";
 
 interface CustomTabsProps {
   tabs: {

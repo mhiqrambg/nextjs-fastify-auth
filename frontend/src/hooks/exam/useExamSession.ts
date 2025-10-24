@@ -21,7 +21,8 @@ export const useExamSession = ({ exam, questions }: UseExamSessionProps) => {
     const initializeSession = async () => {
       try {
         setIsLoading(true);
-        const attemptData = await examService.startExamAttempt(exam.id);
+        const response = await examService.startExamAttempt(exam.id);
+        const attemptData = response.data;
         setAttempt(attemptData);
 
         const newSession: IExamSession = {
@@ -92,8 +93,8 @@ export const useExamSession = ({ exam, questions }: UseExamSessionProps) => {
     if (!attempt) return null;
 
     try {
-      const result = await examService.submitExamAttempt(attempt.id, answers);
-      return result;
+      const response = await examService.submitExamAttempt(attempt.id, answers);
+      return response.data;
     } catch (error) {
       console.error("Failed to submit exam:", error);
       throw error;

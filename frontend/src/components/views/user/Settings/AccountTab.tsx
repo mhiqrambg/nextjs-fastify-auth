@@ -10,8 +10,9 @@ import {
 import { ProfileForm } from "@/types/Profile";
 import { ShieldCheck, ShieldAlert, EditIcon, CheckIcon } from "lucide-react";
 import { useUpdateProfile } from "@/hooks/user/useUpdateProfile";
+import { useProfile } from "@/hooks/user/useProfile";
 import { Controller } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AccountTab({
   formUser,
@@ -20,6 +21,10 @@ export default function AccountTab({
   formUser: ProfileForm;
   isFetching: boolean;
 }) {
+  const { data: profile } = useProfile();
+
+  const user = profile?.data ?? formUser;
+
   const {
     control,
     onSubmit,
@@ -33,6 +38,12 @@ export default function AccountTab({
   } = useUpdateProfile({ name: formUser.name });
 
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (user?.name) {
+      reset({ name: user.name }, { keepDirty: false, keepErrors: true });
+    }
+  }, [user?.name, reset]);
 
   return (
     <Card>

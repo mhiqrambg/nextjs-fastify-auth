@@ -1,26 +1,29 @@
 export interface IExam {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   duration: number; // in minutes
-  totalQuestions: number;
-  passingScore: number;
+  total_questions: number;
+  passing_score: number;
   difficulty: "easy" | "medium" | "hard";
   category: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface IQuestion {
   id: string;
-  examId: string;
+  exam_id: string;
   question: string;
   options: IQuestionOption[];
-  correctAnswer: string;
+  correct_answer: string;
   explanation?: string;
   points: number;
-  order: number;
+  order_num: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface IQuestionOption {
@@ -31,34 +34,37 @@ export interface IQuestionOption {
 
 export interface IExamAttempt {
   id: string;
-  examId: string;
-  userId: string;
-  startTime: string;
-  endTime?: string;
-  answers: IExamAnswer[];
+  exam_id: string;
+  user_id: string;
+  start_time: string;
+  end_time?: string;
   score?: number;
   status: "in_progress" | "completed" | "submitted";
-  timeRemaining?: number; // in seconds
+  time_remaining?: number; // in seconds
+  created_at: string;
+  updated_at: string;
 }
 
 export interface IExamAnswer {
-  questionId: string;
-  selectedAnswer: string;
-  isCorrect?: boolean;
+  id?: string;
+  attempt_id?: string;
+  question_id: string;
+  selected_answer: string;
+  is_correct?: boolean;
   points?: number;
+  created_at?: string;
 }
 
 export interface IExamResult {
   id: string;
-  examAttemptId: string;
-  totalQuestions: number;
-  correctAnswers: number;
+  attempt_id: string;
+  total_questions: number;
+  correct_answers: number;
   score: number;
   percentage: number;
   passed: boolean;
-  completedAt: string;
-  timeTaken: number; // in minutes
-  answers: IExamAnswer[];
+  completed_at: string;
+  time_taken: number; // in minutes
 }
 
 export interface IExamSession {

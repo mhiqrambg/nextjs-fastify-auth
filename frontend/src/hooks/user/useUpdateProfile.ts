@@ -40,18 +40,22 @@ export function useUpdateProfile({ name }: { name: string }) {
 
     onMutate: async () => {
       await qc.cancelQueries({ queryKey: ["profile"] });
-      qc.removeQueries({ queryKey: ["profile"] });
     },
 
     onSuccess: async (res, variables) => {
       const newName = res?.data?.name ?? variables?.name ?? "";
-      await qc.invalidateQueries({ queryKey: ["profile"] });
+
+      qc.setQueryData(["profile"], (old: any) =>
+        old ? { ...old, data: { ...old.data, name: newName } } : old,
+      );
+
       reset({ name: newName });
 
       const msg =
         (res as any)?.message ??
         (res as any)?.data?.message ??
         "Updated successfully";
+
       setMessageUpdated(msg);
 
       setTimeout(() => {
@@ -75,7 +79,7 @@ export function useUpdateProfile({ name }: { name: string }) {
     isDirty,
     isValid,
     reset,
-    messageUpdated,
+    messageUpdated: messageUpdated as string | null,
     setMessageUpdated,
   };
 }
