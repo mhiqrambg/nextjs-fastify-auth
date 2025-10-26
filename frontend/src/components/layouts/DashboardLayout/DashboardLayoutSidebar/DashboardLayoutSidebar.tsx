@@ -1,4 +1,4 @@
-import { Button, Listbox, ListboxItem } from "@heroui/react";
+import { Button, Listbox, ListboxItem, Spinner } from "@heroui/react";
 import { ArrowLeftToLine } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -93,7 +93,7 @@ const DashboardLayoutSidebar = (props: PropsTypes) => {
           disabled={isLoggingOut}
         >
           <ArrowLeftToLine size={18} />
-          {isLoggingOut ? "Logging out..." : "Logout"}
+          {isLoggingOut ? <Spinner size="sm" /> : "Logout"}
         </Button>
       </div>
     </div>

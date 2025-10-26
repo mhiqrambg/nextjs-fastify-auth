@@ -1,9 +1,10 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
+import Dashboard from "@/components/views/Teacher/Dashboard/Dashboard";
 
 const DashboardTeacher = () => {
   return (
     <DashboardLayout title="Teacher" type="teacher" isOpen={true}>
-      <h1>Teacher page</h1>
+      <Dashboard />
     </DashboardLayout>
   );
 };

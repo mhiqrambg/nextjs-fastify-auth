@@ -3,15 +3,17 @@ import { classroomsController } from "./controller";
 import {
   ClassroomIdParamJSON,
   CreateClassroomInputJSON,
+  JoinClassroomInputJSON,
   UpdateClassroomInputJSON,
 } from "./validation";
+
+// middleware
+import { isStudent, isTeacher } from "../../plugins/jwt";
 
 export default async function classroomsRoutes(app: FastifyInstance) {
   const ctrl = classroomsController(app.classroomsService);
 
-  // ==========================
   // CLASSROOMS
-  // ==========================
   app.get(
     "/",
     {
@@ -40,7 +42,7 @@ export default async function classroomsRoutes(app: FastifyInstance) {
   app.post(
     "/",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Classrooms"],
         summary: "Create classroom",
@@ -53,7 +55,7 @@ export default async function classroomsRoutes(app: FastifyInstance) {
   app.put(
     "/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Classrooms"],
         summary: "Update classroom",
@@ -77,9 +79,7 @@ export default async function classroomsRoutes(app: FastifyInstance) {
     ctrl.delete
   );
 
-  // ==========================
   // MEMBERS
-  // ==========================
   app.get(
     "/:id/members",
     {
@@ -96,10 +96,11 @@ export default async function classroomsRoutes(app: FastifyInstance) {
   app.post(
     "/join",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isStudent],
       schema: {
         tags: ["Classrooms"],
         summary: "Join classroom with code",
+        body: JoinClassroomInputJSON,
       },
     },
     ctrl.joinClassroom

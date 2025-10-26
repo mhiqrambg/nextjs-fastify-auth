@@ -4,14 +4,18 @@ import {
   IDUUIDJSON,
   CreateExamInputJSON,
   UpdateExamInputJSON,
+  CreateAnswerInputJSON,
+  StartExamInputJSON,
+  JoinExamInputJSON,
 } from "./validation";
+
+// middleware
+import { isStudent, isTeacher } from "../../plugins/jwt";
 
 export default async function examsRoutes(app: FastifyInstance) {
   const ctrl = examsController(app.examsService);
 
-  // ==========================
   // EXAMS
-  // ==========================
   app.get(
     "/",
     {
@@ -38,7 +42,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.post(
     "/",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams"],
         summary: "Create exam",
@@ -51,7 +55,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.put(
     "/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams"],
         summary: "Update exam",
@@ -65,7 +69,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.delete(
     "/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams"],
         summary: "Delete exam",
@@ -75,9 +79,7 @@ export default async function examsRoutes(app: FastifyInstance) {
     ctrl.delete
   );
 
-  // ==========================
   // QUESTIONS
-  // ==========================
   app.get(
     "/:id/questions",
     {
@@ -93,7 +95,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.post(
     "/questions",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams - Questions"],
         summary: "Create question",
@@ -105,7 +107,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.put(
     "/questions/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams - Questions"],
         summary: "Update question",
@@ -118,7 +120,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.delete(
     "/questions/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams - Questions"],
         summary: "Delete question",
@@ -128,9 +130,7 @@ export default async function examsRoutes(app: FastifyInstance) {
     ctrl.deleteQuestion
   );
 
-  // ==========================
   // OPTIONS
-  // ==========================
   app.get(
     "/questions/:id/options",
     {
@@ -146,7 +146,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.post(
     "/options",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams - Options"],
         summary: "Create option",
@@ -158,7 +158,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.put(
     "/options/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams - Options"],
         summary: "Update option",
@@ -171,7 +171,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.delete(
     "/options/:id",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams - Options"],
         summary: "Delete option",
@@ -181,13 +181,65 @@ export default async function examsRoutes(app: FastifyInstance) {
     ctrl.deleteOption
   );
 
-  // ==========================
+  // USER EXAMS
+  app.post(
+    "/start",
+    {
+      preValidation: [app.auth, isStudent],
+      schema: {
+        tags: ["Exams - User Exams"],
+        summary: "Start exam",
+        body: StartExamInputJSON,
+      },
+    },
+    ctrl.startExam
+  );
+
+  app.post(
+    "/join",
+    {
+      preValidation: [app.auth, isStudent],
+      schema: {
+        tags: ["Exams - User Exams"],
+        summary: "Join exam",
+        body: JoinExamInputJSON,
+      },
+    },
+    ctrl.joinExam
+  );
+
+  // USER ANSWERS
+  app.post(
+    "/answers",
+    {
+      preValidation: [app.auth, isStudent],
+      schema: {
+        tags: ["Exams - Answers"],
+        summary: "Create answer",
+        body: CreateAnswerInputJSON,
+      },
+    },
+    ctrl.createAnswer
+  );
+
+  app.get(
+    "/answers/:id",
+    {
+      preValidation: [app.auth, isStudent],
+      schema: {
+        tags: ["Exams - Answers"],
+        summary: "Get all answers by user exam id",
+        params: IDUUIDJSON,
+      },
+    },
+    ctrl.getAnswer
+  );
+
   // EXAM-QUESTIONS LINK
-  // ==========================
   app.post(
     "/link-question",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams"],
         summary: "Link question to exam",
@@ -199,7 +251,7 @@ export default async function examsRoutes(app: FastifyInstance) {
   app.post(
     "/unlink-question",
     {
-      preValidation: [app.auth],
+      preValidation: [app.auth, isTeacher],
       schema: {
         tags: ["Exams"],
         summary: "Unlink question from exam",
@@ -208,9 +260,7 @@ export default async function examsRoutes(app: FastifyInstance) {
     ctrl.unlinkQuestion
   );
 
-  // ==========================
   // SUBMIT & LEADERBOARD
-  // ==========================
   app.post(
     "/submit",
     {

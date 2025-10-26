@@ -35,7 +35,7 @@ const DashboardLayout = (props: {
           }
           isOpen={open}
         />
-        <div className="h-screen w-full overflow-y-auto px-4">
+        <div className="h-screen w-full overflow-y-auto bg-gray-50 px-4">
           <Navbar
             className="flex justify-between bg-transparent px-0"
             isBlurred={false}

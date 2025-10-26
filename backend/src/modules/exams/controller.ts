@@ -12,12 +12,14 @@ import {
   SubmitExamInput,
   LeaderboardQuery,
   IDUUID,
+  CreateAnswerInput,
+  StartExamInput,
+  JoinExamInput,
+  TUserAnswerRow,
 } from "./validation";
 
 export const examsController = (svc: ExamsService) => ({
-  // ==========================
   // EXAMS
-  // ==========================
   list: async (req: FastifyRequest, reply: FastifyReply) => {
     const query = ListExamsQuery.parse(req.query);
     const { rows, total } = await svc.list(query);
@@ -84,9 +86,7 @@ export const examsController = (svc: ExamsService) => ({
     }
   },
 
-  // ==========================
   // QUESTIONS
-  // ==========================
   getQuestions: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
     const { id: examId } = IDUUID.parse(req.params);
@@ -143,9 +143,7 @@ export const examsController = (svc: ExamsService) => ({
     }
   },
 
-  // ==========================
   // OPTIONS
-  // ==========================
   getOptions: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
     const { id: questionId } = IDUUID.parse(req.params);
@@ -202,9 +200,7 @@ export const examsController = (svc: ExamsService) => ({
     }
   },
 
-  // ==========================
   // EXAM-QUESTIONS LINK
-  // ==========================
   linkQuestion: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
     const body = LinkQuestionInput.parse(req.body);
@@ -232,9 +228,69 @@ export const examsController = (svc: ExamsService) => ({
     }
   },
 
-  // ==========================
+  // USER EXAMS
+  joinExam: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id: userId } = IDUUID.parse(req.user);
+    const b = JoinExamInput.parse(req.body);
+
+    try {
+      const result = await svc.joinExam(b, userId);
+      reply.send({ message: "Exam joined successfully", data: result });
+    } catch (err: any) {
+      throw app.httpErrors.badRequest(err.message);
+    }
+  },
+
+  startExam: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id: userId } = IDUUID.parse(req.user);
+
+    const b = StartExamInput.parse(req.body);
+
+    try {
+      const result = await svc.startExam({ ...b, user_id: userId });
+      reply.send({ message: "Exam started successfully", data: result });
+    } catch (err: any) {
+      throw app.httpErrors.badRequest(err.message);
+    }
+  },
+
+  // USER ANSWERS
+  createAnswer: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const b = CreateAnswerInput.parse(req.body);
+
+    try {
+      const r: TUserAnswerRow = await svc.createAnswer(b);
+      reply.send({
+        message: "Answer created successfully",
+        data: {
+          result: r,
+        },
+      });
+    } catch (err: any) {
+      throw app.httpErrors.badRequest(err.message);
+    }
+  },
+
+  getAnswer: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id } = IDUUID.parse(req.params);
+
+    try {
+      const r = await svc.getAnswer(id);
+      reply.send({
+        message: "Answer retrieved successfully",
+        data: {
+          result: r,
+        },
+      });
+    } catch (err: any) {
+      throw app.httpErrors.badRequest(err.message);
+    }
+  },
   // SUBMIT & LEADERBOARD
-  // ==========================
   submitExam: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
     const body = SubmitExamInput.parse(req.body);

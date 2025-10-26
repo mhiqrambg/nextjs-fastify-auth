@@ -16,6 +16,7 @@ import exams from "./plugins/exams";
 import classrooms from "./plugins/classrooms";
 import errorHandler from "./plugins/errorHandler";
 import opsRoute from "./modules/routes/ops";
+import socket from "./plugins/socket";
 
 // jobs
 import { registerRefreshCleanup } from "./jobs/cleanup-refresh-tokens";
@@ -47,7 +48,7 @@ export function buildApp(opts: FastifyServerOptions = {}) {
   app.register(errorHandler);
   app.register(opsRoute);
   app.register(cors);
-
+  app.register(socket);
   registerRefreshCleanup(app);
 
   // root

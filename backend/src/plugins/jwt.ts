@@ -47,10 +47,14 @@ export default fp(async (app) => {
   });
 });
 
-export const isAdmin = async (request: any, reply: any) => {
-  if ((request.user as any).role !== "admin") {
-    throw request.server.httpErrors.forbidden(
-      "Only admin can access this route"
-    );
+export const isTeacher = async (request: any, reply: any) => {
+  if ((request.user as any).role !== "teacher") {
+    return reply.code(403).send({ error: "Forbidden" });
+  }
+};
+
+export const isStudent = async (request: any, reply: any) => {
+  if ((request.user as any).role !== "user") {
+    return reply.code(403).send({ error: "Forbidden" });
   }
 };

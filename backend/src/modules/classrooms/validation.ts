@@ -77,6 +77,11 @@ export const UpdateClassroomInputJSON = z.toJSONSchema(UpdateClassroomInput, {
   io: "output",
 });
 
+export const JoinClassroomInputJSON = z.toJSONSchema(JoinClassroomInput, {
+  target: "draft-7",
+  io: "output",
+});
+
 // Types
 export type TClassroomRow = z.infer<typeof ClassroomRow>;
 export type TCreateClassroomInput = z.infer<typeof CreateClassroomInput>;
@@ -86,3 +91,4 @@ export type TJoinClassroomInput = z.infer<typeof JoinClassroomInput>;
 export type TClassroomMemberRow = z.infer<typeof ClassroomMemberRow>;
 export type TAddMemberInput = z.infer<typeof AddMemberInput>;
 export type TRemoveMemberInput = z.infer<typeof RemoveMemberInput>;
+export type TJoinClassroomInputJSON = z.infer<typeof JoinClassroomInputJSON>;

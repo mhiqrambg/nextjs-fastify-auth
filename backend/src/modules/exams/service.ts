@@ -13,6 +13,9 @@ import type {
   TLinkQuestionInput,
   TSubmitExamInput,
   TLeaderboardQuery,
+  TStartExamInput,
+  TJoinExamInput,
+  TCreateAnswerInput,
 } from "./validation";
 import { generateCode } from "../../helper/generateCode";
 
@@ -20,9 +23,7 @@ export type ExamsRepo = ReturnType<typeof examsModel>;
 
 export const examsService = (repo: ExamsRepo) => {
   return {
-    // ==========================
     // EXAMS
-    // ==========================
     list: (params: TListExamsQuery) => repo.findAll(params),
 
     getById: async (id: string): Promise<TExamRow | null> => {
@@ -65,9 +66,7 @@ export const examsService = (repo: ExamsRepo) => {
       return result;
     },
 
-    // ==========================
     // QUESTIONS
-    // ==========================
     getQuestion: async (id: string): Promise<TQuestionRow | null> => {
       const question = await repo.findQuestionById(id);
       return question;
@@ -111,9 +110,7 @@ export const examsService = (repo: ExamsRepo) => {
       return result;
     },
 
-    // ==========================
     // OPTIONS
-    // ==========================
     getOptionsByQuestionId: async (questionId: string) => {
       const question = await repo.findQuestionById(questionId);
       if (!question) throw new Error("Question not found");
@@ -151,9 +148,77 @@ export const examsService = (repo: ExamsRepo) => {
       return result;
     },
 
-    // ==========================
+    // USER EXAMS / START
+    joinExam: async (data: TJoinExamInput, userId: string) => {
+      const xm = await repo.findByCode(data.code);
+      if (!xm) throw new Error("Exam not found");
+      if (!xm.is_active) throw new Error("Exam is not active");
+
+      const exs = await repo
+        .findMemberByUserAndClassroom(xm.classroom_id, userId)
+        .catch(() => null);
+
+      if (!exs) throw new Error("Not a member of this classroom");
+
+      const usxm = await repo
+        .findUserExamByUserIdAndExamId(userId, xm.id)
+        .catch(() => null);
+
+      if (usxm) throw new Error("Already joined this exam");
+
+      const jxm = await repo.joinExam({
+        user_id: userId,
+        exam_id: xm.id,
+        score: 0,
+        status: "in_progress",
+        submit_time: null,
+      });
+
+      if (!jxm) throw new Error("Failed to join exam");
+
+      return jxm;
+    },
+    startExam: async (data: TStartExamInput) => {
+      const exam = await repo.findById(data.exam_id);
+      if (!exam) throw new Error("Exam not found");
+
+      data.status = "in_progress";
+      data.score = 0;
+
+      const userExam = await repo.startExam(data);
+      if (!userExam) throw new Error("Failed to start exam");
+
+      return userExam;
+    },
+
+    // USER ANSWERS
+    createAnswer: async (data: TCreateAnswerInput) => {
+      const exs = await repo.findUserExamByIdAndQuestionId(
+        data.user_exam_id,
+        data.question_id
+      );
+
+      if (exs) throw new Error("You have already answered this question");
+
+      const o = await repo.findOptionById(data.option_id);
+      if (!o) throw new Error("Option not found");
+
+      if (o.question_id !== data.question_id)
+        throw new Error("Option does not belong to question");
+
+      const a = await repo.createAnswer(data);
+      if (!a) throw new Error("Failed to create answer");
+
+      return a;
+    },
+    getAnswer: async (userExamId: string) => {
+      const va = await repo.viewAnswer(userExamId);
+      if (!va) throw new Error("You have not answered this question");
+
+      return va;
+    },
+
     // EXAM-QUESTIONS LINK
-    // ==========================
     linkQuestion: async (data: TLinkQuestionInput) => {
       const exam = await repo.findById(data.exam_id);
       if (!exam) throw new Error("Exam not found");
@@ -176,9 +241,7 @@ export const examsService = (repo: ExamsRepo) => {
       return { success: true };
     },
 
-    // ==========================
-    // USER EXAMS (SUBMIT & LEADERBOARD)
-    // ==========================
+    // USER EXAMS
     submitExam: async (data: TSubmitExamInput, userId: string) => {
       const exam = await repo.findById(data.exam_id);
       if (!exam) throw new Error("Exam not found");

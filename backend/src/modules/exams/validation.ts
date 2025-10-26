@@ -1,5 +1,28 @@
 import { z } from "zod";
 
+export const JoinExamInput = z.object({
+  code: z.string().min(4).max(12).startsWith("EXAM"),
+});
+
+export const StartExamInput = z.object({
+  exam_id: z.uuid(),
+  user_id: z.uuid().optional(),
+  score: z.number().min(0).max(100).optional(),
+  status: z
+    .enum(["in_progress", "completed", "abandoned", "timed_out"])
+    .optional(),
+});
+
+export const JoinExamInputJSON = z.toJSONSchema(JoinExamInput, {
+  target: "draft-7",
+  io: "output",
+});
+
+export const StartExamInputJSON = z.toJSONSchema(StartExamInput, {
+  target: "draft-7",
+  io: "output",
+});
+
 // Exam schemas
 export const ExamRow = z.object({
   id: z.uuid(),
@@ -10,6 +33,7 @@ export const ExamRow = z.object({
   duration_minutes: z.number(),
   passing_score: z.number().min(1).max(100),
   code: z.string(),
+  is_active: z.boolean(),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -106,18 +130,33 @@ export const UserExamRow = z.object({
   user_id: z.uuid(),
   exam_id: z.uuid(),
   score: z.number(),
-  submit_time: z.string(),
-  updated_at: z.string(),
+  status: z.enum(["in_progress", "completed", "abandoned", "timed_out"]),
+  submit_time: z.string().nullable(),
 });
 
 export const SubmitExamInput = z.object({
   exam_id: z.uuid(),
-  answers: z.record(z.uuid(), z.uuid()), // question_id -> option_id
+  answers: z.record(z.uuid(), z.uuid()),
 });
 
 export const LeaderboardQuery = z.object({
   exam_id: z.uuid(),
   limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+// User answer schemas
+export const UserAnswerRow = z.object({
+  user_exam_id: z.uuid(),
+  question_id: z.uuid(),
+  option_id: z.uuid(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export const CreateAnswerInput = z.object({
+  user_exam_id: z.uuid(),
+  question_id: z.uuid(),
+  option_id: z.uuid(),
 });
 
 // Schema JSON for Swagger
@@ -132,6 +171,11 @@ export const CreateExamInputJSON = z.toJSONSchema(CreateExamInput, {
 });
 
 export const UpdateExamInputJSON = z.toJSONSchema(UpdateExamInput, {
+  target: "draft-7",
+  io: "output",
+});
+
+export const CreateAnswerInputJSON = z.toJSONSchema(CreateAnswerInput, {
   target: "draft-7",
   io: "output",
 });
@@ -151,3 +195,9 @@ export type TLinkQuestionInput = z.infer<typeof LinkQuestionInput>;
 export type TUserExamRow = z.infer<typeof UserExamRow>;
 export type TSubmitExamInput = z.infer<typeof SubmitExamInput>;
 export type TLeaderboardQuery = z.infer<typeof LeaderboardQuery>;
+export type TCreateAnswerInput = z.infer<typeof CreateAnswerInput>;
+export type TUserAnswerRow = z.infer<typeof UserAnswerRow>;
+export type TStartExamInput = z.infer<typeof StartExamInput>;
+export type TStartExamInputJSON = z.infer<typeof StartExamInputJSON>;
+export type TJoinExamInput = z.infer<typeof JoinExamInput>;
+export type TJoinExamInputJSON = z.infer<typeof JoinExamInputJSON>;

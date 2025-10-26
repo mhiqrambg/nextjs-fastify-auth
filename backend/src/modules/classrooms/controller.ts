@@ -9,6 +9,7 @@ import {
   AddMemberInput,
   RemoveMemberInput,
 } from "./validation";
+import { IDUUID } from "../exams/validation";
 
 export const classroomsController = (svc: ClassroomsService) => ({
   // ==========================
@@ -103,14 +104,18 @@ export const classroomsController = (svc: ClassroomsService) => ({
 
   joinClassroom: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
-    const body = JoinClassroomInput.parse(req.body);
-    const { id: userId } = req.user;
+
+    const b = JoinClassroomInput.parse(req.body);
+    const { id: userId } = IDUUID.parse(req.user);
 
     try {
-      const result = await svc.joinClassroom(body, userId);
+      const result = await svc.joinClassroom(b, userId);
       reply.code(201).send({
         message: "Successfully joined classroom",
-        data: result,
+        data: {
+          classroom: result.c,
+          member: result.m,
+        },
       });
     } catch (err: any) {
       throw app.httpErrors.badRequest(err.message);

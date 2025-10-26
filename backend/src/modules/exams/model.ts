@@ -12,12 +12,16 @@ import type {
   TUpdateOptionInput,
   TLinkQuestionInput,
   TLeaderboardQuery,
+  TStartExamInput,
+  TUserExamRow,
+  TJoinExamInput,
+  TCreateAnswerInput,
+  TUserAnswerRow,
 } from "./validation";
+import { TClassroomMemberRow } from "../classrooms/validation";
 
 export const examsModel = (app: FastifyInstance) => ({
-  // ==========================
   // EXAMS
-  // ==========================
   findAll: async (
     params: TListExamsQuery
   ): Promise<{ rows: TExamRow[]; total: number }> => {
@@ -148,9 +152,7 @@ export const examsModel = (app: FastifyInstance) => ({
     return app.db.query(`DELETE FROM exams WHERE id = $1`, [id]);
   },
 
-  // ==========================
   // QUESTIONS
-  // ==========================
   findQuestionById: (id: string) => {
     return app.db.one<TQuestionRow>(
       `SELECT id, text, is_active, created_at, updated_at
@@ -211,9 +213,7 @@ export const examsModel = (app: FastifyInstance) => ({
     return app.db.query(`DELETE FROM questions WHERE id = $1`, [id]);
   },
 
-  // ==========================
   // OPTIONS
-  // ==========================
   findOptionsByQuestionId: async (
     questionId: string
   ): Promise<TOptionRow[]> => {
@@ -275,9 +275,7 @@ export const examsModel = (app: FastifyInstance) => ({
     return app.db.query(`DELETE FROM options WHERE id = $1`, [id]);
   },
 
-  // ==========================
   // EXAM-QUESTIONS LINK
-  // ==========================
   linkQuestion: (data: TLinkQuestionInput) => {
     return app.db.query(
       `INSERT INTO exam_questions (exam_id, question_id)
@@ -294,19 +292,51 @@ export const examsModel = (app: FastifyInstance) => ({
     );
   },
 
-  // ==========================
-  // USER EXAMS (LEADERBOARD)
-  // ==========================
+  // USER EXAMS / START
+  startExam: async (data: TStartExamInput) => {
+    console.log("data", data);
+    return app.db.one<TUserExamRow>(
+      `INSERT INTO users_exams (user_id, exam_id, score,status, submit_time)
+       VALUES ($1, $2, $3, $4, now())
+       RETURNING id, user_id, exam_id, score, submit_time, created_at, updated_at`,
+      [data.user_id, data.exam_id, data.score, data.status]
+    );
+  },
+
   submitExam: async (userId: string, examId: string, score: number) => {
     return app.db.query(
       `INSERT INTO users_exams (user_id, exam_id, score, submit_time)
        VALUES ($1, $2, $3, now())
        ON CONFLICT (user_id, exam_id) 
-       DO UPDATE SET score = $3, submit_time = now(), updated_at = now()`,
+       DO UPDATE SET score = $3, submit_time = null, updated_at = now()`,
       [userId, examId, score]
     );
   },
 
+  findMemberByUserAndClassroom: (classroomId: string, userId: string) => {
+    return app.db.one<TClassroomMemberRow>(
+      `SELECT user_id, classroom_id
+       FROM classroom_members 
+       WHERE classroom_id = $1 AND user_id = $2`,
+      [classroomId, userId]
+    );
+  },
+
+  findUserExamByUserIdAndExamId: (userId: string, examId: string) => {
+    return app.db.one<TUserExamRow>(
+      `SELECT * FROM users_exams WHERE user_id = $1 AND exam_id = $2`,
+      [userId, examId]
+    );
+  },
+
+  joinExam: (data: TUserExamRow) => {
+    return app.db.one<TUserExamRow>(
+      `INSERT INTO users_exams (user_id, exam_id, score, status, submit_time)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [data.user_id, data.exam_id, data.score, data.status, data.submit_time]
+    );
+  },
   getLeaderboard: async (params: TLeaderboardQuery) => {
     const sql = `
       SELECT ue.user_id, ue.exam_id, ue.score, ue.submit_time, u.name as user_name
@@ -327,5 +357,68 @@ export const examsModel = (app: FastifyInstance) => ({
        WHERE user_id = $1 AND exam_id = $2`,
       [userId, examId]
     );
+  },
+
+  // USER ANSWERS
+  createAnswer: (data: TCreateAnswerInput) => {
+    return app.db.one<TUserAnswerRow>(
+      `INSERT INTO user_answers (user_exam_id, question_id, option_id)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [data.user_exam_id, data.question_id, data.option_id]
+    );
+  },
+
+  findUserExamByIdAndQuestionId: (userExamId: string, questionId: string) => {
+    return app.db.one<TUserAnswerRow>(
+      `SELECT * FROM user_answers WHERE user_exam_id = $1 AND question_id = $2`,
+      [userExamId, questionId]
+    );
+  },
+
+  viewAnswer: async (userExamId: string) => {
+    const result = await app.db.query<TUserAnswerRow>(
+      `
+      SELECT
+          -- Detail Soal dan Urutan
+          q.id AS question_id,
+          q.text AS question_text,
+          eq.question_order,
+          
+          -- Detail Jawaban Pengguna
+          ua.option_id AS selected_option_id,
+          o_selected.text AS selected_answer_text,
+          
+          -- Status Jawaban (Kunci Jawaban)
+          o_correct.text AS correct_answer_text,
+          o_selected.is_correct AS is_answer_correct
+          
+      FROM
+          user_answers ua
+      -- 1. Merujuk ke Sesi Ujian (users_exams) untuk mendapatkan ID Ujian
+      JOIN
+          users_exams ue ON ua.user_exam_id = ue.id
+      -- 2. Merujuk ke Pilihan Jawaban yang Dipilih (o_selected)
+      JOIN
+          options o_selected ON ua.option_id = o_selected.id
+      -- 3. Merujuk ke Soal (q)
+      JOIN
+          questions q ON ua.question_id = q.id
+      -- 4. Merujuk ke Tabel Penghubung Ujian-Soal (eq) untuk mendapatkan urutan soal
+      JOIN
+          exam_questions eq ON q.id = eq.question_id AND ue.exam_id = eq.exam_id
+      -- 5. Cari Kunci Jawaban yang Benar (o_correct)
+      JOIN
+          options o_correct ON o_correct.question_id = q.id AND o_correct.is_correct = TRUE
+          
+      WHERE
+          ua.user_exam_id = $1 -- Hanya butuh satu parameter
+      ORDER BY
+          eq.question_order ASC;
+      `,
+      [userExamId]
+    );
+
+    return result.rows;
   },
 });

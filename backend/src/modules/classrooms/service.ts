@@ -59,47 +59,44 @@ export const classroomsService = (repo: ClassroomsRepo) => {
       return result;
     },
 
-    // ==========================
     // MEMBERS
-    // ==========================
     getMembers: async (classroomId: string) => {
-      const classroom = await repo.findById(classroomId);
-      if (!classroom) throw new Error("Classroom not found");
+      const c = await repo.findById(classroomId);
+      if (!c) throw new Error("Classroom not found");
+      const m = await repo.findMembers(classroomId);
 
-      return repo.findMembers(classroomId);
+      return m;
     },
 
     joinClassroom: async (data: TJoinClassroomInput, userId: string) => {
-      const classroom = await repo.findByCode(data.code);
-      if (!classroom) throw new Error("Classroom not found with this code");
+      const c = await repo.findByCode(data.code);
+      if (!c) throw new Error("Classroom not found with this code");
 
-      // Check if already a member
       const existingMember = await repo
-        .findMemberByUserAndClassroom(classroom.id, userId)
+        .findMemberByUserAndClassroom(c.id, userId)
         .catch(() => null);
 
       if (existingMember) {
         throw new Error("Already a member of this classroom");
       }
 
-      const member = await repo.addMember({
-        classroom_id: classroom.id,
+      const m = await repo.addMember({
+        classroom_id: c.id,
         user_id: userId,
       });
 
-      if (!member) throw new Error("Failed to join classroom");
+      if (!m) throw new Error("Failed to join classroom");
 
-      return { classroom, member };
+      return { c, m };
     },
 
     addMember: async (data: TAddMemberInput) => {
       const classroom = await repo.findById(data.classroom_id);
       if (!classroom) throw new Error("Classroom not found");
 
-      // Check if already a member
       const existingMember = await repo
         .findMemberByUserAndClassroom(data.classroom_id, data.user_id)
-        .catch(() => null);
+        .then((res) => null);
 
       if (existingMember) {
         throw new Error("User is already a member of this classroom");
