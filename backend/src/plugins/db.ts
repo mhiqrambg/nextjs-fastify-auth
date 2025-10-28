@@ -55,6 +55,15 @@ export default fp(async (app) => {
       return rows[0] ?? null;
     },
 
+    // Ambil banyak baris (atau [])
+    async many<T extends QueryResultRow = any>(
+      text: string,
+      params?: any[]
+    ): Promise<T[]> {
+      const { rows } = await app.pg.query<T>(text, params);
+      return rows;
+    },
+
     // Transaksi
     tx<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
       return app.pg.transact(fn);
@@ -87,6 +96,10 @@ declare module "fastify" {
         text: string,
         params?: any[]
       ): Promise<T | null>;
+      many<T extends QueryResultRow = any>(
+        text: string,
+        params?: any[]
+      ): Promise<T[]>;
       tx<T>(fn: (client: import("pg").PoolClient) => Promise<T>): Promise<T>;
       withClient<T>(
         fn: (client: import("pg").PoolClient) => Promise<T>

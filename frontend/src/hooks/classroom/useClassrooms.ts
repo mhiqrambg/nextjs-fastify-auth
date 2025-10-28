@@ -1,9 +1,31 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import { classroomService } from "@/services/classroom";
 import type {
   ICreateClassroomInput,
   IJoinClassroomInput,
+  ICreateClassroomForm,
+  TClassroomExam,
 } from "@/types/Classroom";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { CloudLightning } from "lucide-react";
+
+const CreateClassroomSchema = yup.object().shape({
+  name: yup.string().required("Name is required"),
+  description: yup.string().required("Description is required"),
+  imageFile: yup.mixed().required("Image is required"),
+});
+
+export type TCreateClassroomSchema = yup.InferType<
+  typeof CreateClassroomSchema
+>;
 
 interface UseClassroomsParams {
   q?: string;
@@ -14,13 +36,17 @@ interface UseClassroomsParams {
 }
 
 export function useClassrooms(params?: UseClassroomsParams) {
+  const paramsKey = JSON.stringify(params);
+
   return useQuery({
-    queryKey: ["classrooms", params],
+    queryKey: ["classrooms", paramsKey],
+
     queryFn: async () => {
       const res = await classroomService.getClassrooms(params);
       return res;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -29,6 +55,8 @@ export function useClassroom(classroomId: string) {
     queryKey: ["classroom", classroomId],
     queryFn: async () => {
       const res = await classroomService.getClassroomById(classroomId);
+
+      console.log("res", res.data);
       return res.data;
     },
     enabled: !!classroomId,
@@ -48,28 +76,71 @@ export function useClassroomMembers(classroomId: string) {
   });
 }
 
-export function useClassroomExams(classroomId: string) {
+export function useClassroomExams(
+  classroomId: string,
+  options?: Partial<UseQueryOptions<TClassroomExam[]>>,
+) {
   return useQuery({
     queryKey: ["classroom-exams", classroomId],
     queryFn: async () => {
       const res = await classroomService.getClassroomExams(classroomId);
+
+      console.log("res", res.data);
       return res.data;
     },
-    enabled: !!classroomId,
+    enabled: !!classroomId && (options?.enabled ?? true),
     staleTime: 1000 * 60 * 5,
+    ...options,
   });
 }
 
 export function useCreateClassroom() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const form = useForm<TCreateClassroomSchema>({
+    resolver: yupResolver(CreateClassroomSchema),
+    mode: "onChange",
+    defaultValues: { name: "", description: "", imageFile: null as any },
+  });
+
+  const mutation = useMutation({
     mutationFn: (data: ICreateClassroomInput) =>
       classroomService.createClassroom(data),
     onSuccess: () => {
+      form.reset();
       queryClient.invalidateQueries({ queryKey: ["classrooms"] });
     },
+    onError: (err: any) => {
+      const message =
+        err?.response?.data?.message || err?.message || "Something went wrong";
+      form.setError("root", { message });
+    },
   });
+
+  const handleCreateClassroom = (v: TCreateClassroomSchema) => {
+    const payload: ICreateClassroomInput = {
+      name: v.name,
+      description: v.description,
+      imageFile: v.imageFile as File,
+    };
+    mutation.mutate(payload);
+  };
+
+  const createClassroomAsync = (v: TCreateClassroomSchema) => {
+    const payload: ICreateClassroomInput = {
+      name: v.name,
+      description: v.description,
+      imageFile: v.imageFile as File,
+    };
+    return mutation.mutateAsync(payload);
+  };
+
+  return {
+    ...form,
+    handleCreateClassroom,
+    createClassroomAsync,
+    isSubmitting: mutation.isPending,
+  };
 }
 
 export function useJoinClassroom() {

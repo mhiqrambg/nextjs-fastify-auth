@@ -7,11 +7,10 @@ import type {
   TClassroomMemberRow,
   TAddMemberInput,
 } from "./validation";
+import { TExamRow } from "../exams/validation";
 
 export const classroomsModel = (app: FastifyInstance) => ({
-  // ==========================
-  // CLASSROOMS
-  // ==========================
+  // All CLASSROOMS
   findAll: async (
     params: TListClassroomsQuery,
     userId?: string
@@ -57,12 +56,13 @@ export const classroomsModel = (app: FastifyInstance) => ({
     const total = countRes.rows[0]?.count ?? 0;
 
     const dataSql = `
-      SELECT id, user_id, name, description, code, image_url, created_at, updated_at
-      FROM classrooms
-      ${whereClause}
-      ORDER BY ${sortCol} ${orderDir}
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
+    SELECT id, user_id, name, description, code, image_url, created_at, updated_at
+    FROM classrooms
+    ${whereClause}
+    ORDER BY ${sortCol} ${orderDir}
+    LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+  `;
+
     const dataRes = await app.db.query<TClassroomRow>(dataSql, [
       ...queryParams,
       pageSize,
@@ -72,13 +72,45 @@ export const classroomsModel = (app: FastifyInstance) => ({
     return { rows: dataRes.rows, total };
   },
 
-  findById: (id: string) => {
-    return app.db.one<TClassroomRow>(
-      `SELECT id, user_id, name, description, code, image_url, created_at, updated_at
-       FROM classrooms WHERE id = $1`,
+  findById: async (id: string) => {
+    const res = await app.db.one<TClassroomRow>(
+      `SELECT 
+       c.id, c.user_id, c.name, c.description, c.code, c.image_url, c.created_at, c.updated_at,
+       u.id AS teacher_id, u.name AS teacher_name, u.email AS teacher_email, u.image_url AS teacher_image_url
+       
+       FROM classrooms c
+       JOIN users u ON c.user_id = u.id
+       WHERE c.id = $1
+       `,
       [id]
     );
+
+    return res;
   },
+
+  //   findByIdWithMembersRaw: async (classroomId: string): Promise<TRawClassroomMemberData[]> => {
+  //     const dataSql = `
+  //         SELECT
+  //             c.id AS classroom_id, c.name AS classroom_name,
+  //             u.id AS member_id, u.name AS member_name, u.role AS member_role,
+  //             cm.total AS member_total_score
+  //         FROM
+  //             Classroom c
+  //         -- JOIN untuk mendapatkan Anggota Kelas
+  //         JOIN
+  //             Classroom_members cm ON c.id = cm.classroom_id
+  //         -- JOIN untuk mendapatkan detail User Anggota
+  //         JOIN
+  //             Users u ON cm.user_id = u.id
+  //         WHERE
+  //             c.id = $1
+  //     `;
+
+  //     // Menggunakan .query atau .many() karena hasilnya pasti array
+  //     const res = await app.db.query<TRawClassroomMemberData>(dataSql, [classroomId]);
+
+  //     return res.rows; // Mengembalikan array baris
+  // },
 
   findByCode: (code: string) => {
     return app.db.one<TClassroomRow>(
@@ -132,14 +164,22 @@ export const classroomsModel = (app: FastifyInstance) => ({
     return app.db.query(`DELETE FROM classrooms WHERE id = $1`, [id]);
   },
 
-  // ==========================
   // MEMBERS
-  // ==========================
   findMembers: async (classroomId: string): Promise<TClassroomMemberRow[]> => {
     const sql = `
-      SELECT user_id, classroom_id
-      FROM classroom_members
-      WHERE classroom_id = $1
+      SELECT 
+        cm.user_id, 
+        cm.classroom_id, 
+        u.id AS member_id, 
+        u.name AS member_name, 
+        u.email AS member_email, 
+        u.image_url AS member_image_url
+      FROM 
+        classroom_members cm  -- Memberi alias cm
+      JOIN 
+        users u ON cm.user_id = u.id
+      WHERE 
+        cm.classroom_id = $1
     `;
     const res = await app.db.query<TClassroomMemberRow>(sql, [classroomId]);
     return res.rows;
@@ -178,5 +218,14 @@ export const classroomsModel = (app: FastifyInstance) => ({
     `;
     const res = await app.db.query<{ count: number }>(sql, [classroomId]);
     return res.rows[0]?.count ?? 0;
+  },
+
+  // CLASSROOM EXAMS
+  findExamsByClassroomId: async (classroomId: string) => {
+    const sql = `
+      SELECT * FROM exams WHERE classroom_id = $1 AND is_active = true
+    `;
+    const res = await app.db.many<TExamRow>(sql, [classroomId]);
+    return res;
   },
 });

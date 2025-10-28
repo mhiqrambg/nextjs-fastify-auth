@@ -36,10 +36,16 @@ export default function PaginationControls({
       return (
         <button
           key={key}
-          className={cn(itemClass, "bg-default-200/50 h-8 w-8 min-w-8")}
+          disabled={page >= totalPages}
+          className={cn(
+            itemClass,
+            "bg-default-200/50 h-8 w-8 min-w-8",
+            page >= totalPages && "cursor-not-allowed opacity-50",
+          )}
           onClick={() => {
-            onNext?.();
-            onChange(page + 1);
+            if (page < totalPages) {
+              onChange(page + 1);
+            }
           }}
         >
           <ChevronRight />
@@ -50,10 +56,16 @@ export default function PaginationControls({
       return (
         <button
           key={key}
-          className={cn(itemClass, "bg-default-200/50 h-8 w-8 min-w-8")}
+          disabled={page <= 1}
+          className={cn(
+            itemClass,
+            "bg-default-200/50 h-8 w-8 min-w-8",
+            page <= 1 && "cursor-not-allowed opacity-50",
+          )}
           onClick={() => {
-            onPrev?.();
-            onChange(page - 1);
+            if (page > 1) {
+              onChange(page - 1);
+            }
           }}
         >
           <ChevronLeft />
@@ -74,7 +86,7 @@ export default function PaginationControls({
         className={cn(
           itemClass,
           isActive &&
-            "to-primary-400 from-primary-200 bg-linear-to-br font-bold text-white",
+            "bg-linear-to-br from-yellow-400 to-orange-500 font-bold text-white",
         )}
         onClick={() => onChange(value)}
       >

@@ -7,6 +7,8 @@ import type {
   TListUsersQuery,
   TUpdateUserInput,
 } from "./validation";
+import { TClassroomRow } from "../classrooms/validation";
+import { TExamRow, TUserExamRow } from "../exams/validation";
 
 export const usersModel = (app: FastifyInstance) => ({
   findAll: async (
@@ -53,8 +55,39 @@ export const usersModel = (app: FastifyInstance) => ({
     );
   },
 
-  findById: (id: string) => {
-    return app.db.one<TUserRow>(`SELECT * FROM users WHERE id = $1`, [id]);
+  findById: async (id: string) => {
+    const userPromise = app.db.one<TUserRow>(
+      `SELECT * FROM users WHERE id = $1`,
+      [id]
+    );
+    const classroomPromise = app.db.many<TClassroomRow>(
+      `SELECT * FROM classrooms WHERE user_id = $1 AND is_active = true LIMIT 5`,
+      [id]
+    );
+    const examPromise = app.db.many<TExamRow>(
+      `SELECT * FROM exams WHERE user_id = $1 AND is_active = true LIMIT 5`,
+      [id]
+    );
+    const userExamPromise = app.db.many<TUserExamRow>(
+      `SELECT * FROM users_exams WHERE user_id = $1 LIMIT 5`,
+      [id]
+    );
+
+    const [u, c, e, ue] = await Promise.all([
+      userPromise,
+      classroomPromise,
+      examPromise,
+      userExamPromise,
+    ]);
+
+    const newUser = {
+      ...u,
+      classrooms: c,
+      exams: e,
+      user_exams: ue,
+    };
+
+    return newUser;
   },
 
   findUserByEmail: async (email: string): Promise<TUserRow | null> => {

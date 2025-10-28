@@ -48,12 +48,12 @@ export const usersService = (repo: UsersRepo) => {
     },
 
     findUser: async (id: string) => {
-      const user = await repo.findById(id);
+      const u = await repo.findById(id);
 
-      if (!user) throw new Error("User not found");
+      if (!u) throw new Error("User not found");
 
       const newUser = {
-        ...user,
+        ...u,
         password: undefined,
       };
 

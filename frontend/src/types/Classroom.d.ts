@@ -1,15 +1,48 @@
-export interface IClassroom {
+export type TClassroom = {
   id: string;
+  user_id: string;
   name: string;
-  description?: string;
+  description: string | null;
   code: string;
-  image_url?: string;
-  teacher_id: string;
-  is_active: boolean;
-  max_students: number;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
+  teacher_id: string;
+  teacher_name: string;
+  teacher_email: string;
+  teacher_image_url: string | null;
+};
+
+export type ICreateClassroomInput = {
+  name: string;
+  description: string;
+  imageFile: File | null;
+};
+
+export interface ICreateClassroomForm {
+  name: string;
+  description: string;
+  imageFile: File | null;
 }
+
+export type TClassroomMember = {
+  member_id: string;
+  member_name: string;
+  member_email: string;
+  member_image_url: string | null;
+};
+
+export type TClassroomExam = {
+  id: string;
+  title: string;
+  description: string;
+  duration_minutes: number;
+  passing_score: number;
+  code: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
 export interface IClassroomMember {
   id: string;

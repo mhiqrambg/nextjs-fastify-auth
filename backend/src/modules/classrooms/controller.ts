@@ -12,13 +12,13 @@ import {
 import { IDUUID } from "../exams/validation";
 
 export const classroomsController = (svc: ClassroomsService) => ({
-  // ==========================
   // CLASSROOMS
-  // ==========================
   list: async (req: FastifyRequest, reply: FastifyReply) => {
     const query = ListClassroomsQuery.parse(req.query);
+
     const userId = req.user?.id;
     const { rows, total } = await svc.list(query, userId);
+
     return reply.send({
       data: rows,
       pagination: { page: query.page, pageSize: query.pageSize, total },
@@ -86,12 +86,12 @@ export const classroomsController = (svc: ClassroomsService) => ({
     }
   },
 
-  // ==========================
   // MEMBERS
-  // ==========================
   getMembers: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
     const { id: classroomId } = ClassroomIdParam.parse(req.params);
+
+    console.log("classroomId", classroomId);
 
     try {
       const members = await svc.getMembers(classroomId);
@@ -145,6 +145,20 @@ export const classroomsController = (svc: ClassroomsService) => ({
       await svc.removeMember(body);
       return reply.send({ message: "Member removed successfully" });
     } catch (err: any) {
+      throw app.httpErrors.badRequest(err.message);
+    }
+  },
+
+  // CLASSROOM EXAMS
+  getExams: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id: classroomId } = ClassroomIdParam.parse(req.params);
+
+    try {
+      const exams = await svc.getExams(classroomId);
+      return reply.send({ message: "Success", data: exams });
+    } catch (err: any) {
+      req.log.error(err);
       throw app.httpErrors.badRequest(err.message);
     }
   },

@@ -15,14 +15,14 @@ export type ClassroomsRepo = ReturnType<typeof classroomsModel>;
 
 export const classroomsService = (repo: ClassroomsRepo) => {
   return {
-    // ==========================
     // CLASSROOMS
-    // ==========================
     list: (params: TListClassroomsQuery, userId?: string) =>
       repo.findAll(params, userId),
 
     getById: async (id: string): Promise<TClassroomRow | null> => {
       const classroom = await repo.findById(id);
+      if (!classroom) throw new Error("Classroom not found");
+
       return classroom;
     },
 
@@ -122,6 +122,11 @@ export const classroomsService = (repo: ClassroomsRepo) => {
       if (!result) throw new Error("Failed to remove member");
 
       return result;
+    },
+
+    // CLASSROOM EXAMS
+    getExams: async (classroomId: string) => {
+      return repo.findExamsByClassroomId(classroomId);
     },
   };
 };

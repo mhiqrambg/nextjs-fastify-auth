@@ -55,7 +55,6 @@ export const authService = (repo: AuthRepo) => ({
 
       return { otp, expiresAt };
     } catch (err) {
-      console.log("error :", err);
       await repo.deleteUser(userId);
       throw err;
     }

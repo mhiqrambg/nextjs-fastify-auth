@@ -13,7 +13,7 @@ import { isStudent, isTeacher } from "../../plugins/jwt";
 export default async function classroomsRoutes(app: FastifyInstance) {
   const ctrl = classroomsController(app.classroomsService);
 
-  // CLASSROOMS
+  // All Classrooms
   app.get(
     "/",
     {
@@ -77,6 +77,19 @@ export default async function classroomsRoutes(app: FastifyInstance) {
       },
     },
     ctrl.delete
+  );
+
+  // CLASSROOM EXAMS
+  app.get(
+    "/:id/exams",
+    {
+      schema: {
+        tags: ["Classrooms - Exams"],
+        summary: "Get classroom exams",
+        params: ClassroomIdParamJSON,
+      },
+    },
+    ctrl.getExams
   );
 
   // MEMBERS

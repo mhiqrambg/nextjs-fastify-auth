@@ -294,7 +294,6 @@ export const examsModel = (app: FastifyInstance) => ({
 
   // USER EXAMS / START
   startExam: async (data: TStartExamInput) => {
-    console.log("data", data);
     return app.db.one<TUserExamRow>(
       `INSERT INTO users_exams (user_id, exam_id, score,status, submit_time)
        VALUES ($1, $2, $3, $4, now())

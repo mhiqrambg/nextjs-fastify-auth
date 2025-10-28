@@ -76,7 +76,7 @@ export const usersController = (svc: UsersService) => ({
       }
 
       return reply.send({
-        message: "Dashboar12d",
+        message: "Successfully get dashboard data",
         data: {
           name: user.name,
           id: user.id,
@@ -99,7 +99,7 @@ export const usersController = (svc: UsersService) => ({
         throw app.httpErrors.notFound("User not found");
       }
 
-      return reply.send({ message: "success", data: user });
+      return reply.send({ message: "Successfully get user data", data: user });
     } catch (err: any) {
       req.log.error(err);
 

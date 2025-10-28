@@ -1,7 +1,5 @@
-export const TeacherClass = () => {
-  return (
-    <div>
-      <h1>Teacher Class</h1>
-    </div>
-  );
-};
+import Class from "./Class";
+import OneClass from "./OneClass";
+import CreateClass from "./CreateClass";
+
+export { Class, OneClass, CreateClass };

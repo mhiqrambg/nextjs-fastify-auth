@@ -17,6 +17,7 @@ import {
   JoinExamInput,
   TUserAnswerRow,
 } from "./validation";
+import { ClassroomIdParam } from "../classrooms/validation";
 
 export const examsController = (svc: ExamsService) => ({
   // EXAMS
@@ -290,6 +291,7 @@ export const examsController = (svc: ExamsService) => ({
       throw app.httpErrors.badRequest(err.message);
     }
   },
+
   // SUBMIT & LEADERBOARD
   submitExam: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;

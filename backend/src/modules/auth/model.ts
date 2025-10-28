@@ -42,7 +42,6 @@ export const authModel = (app: FastifyInstance) => ({
     return user.rows[0] ?? null;
   },
 
-  // Memperbarui fungsi untuk mencari OTP yang valid dan terbaru
   findOtpByPhone: async (phone_number: string) => {
     const otpQuery = `
     SELECT * 

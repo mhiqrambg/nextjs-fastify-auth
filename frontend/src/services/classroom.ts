@@ -1,9 +1,6 @@
 import instance from "@/libs/axios/instance";
 import endpoint from "./endpoint.constant";
 import type {
-  IClassroom,
-  IClassroomMember,
-  IClassroomExam,
   ICreateClassroomInput,
   IUpdateClassroomInput,
   IJoinClassroomInput,
