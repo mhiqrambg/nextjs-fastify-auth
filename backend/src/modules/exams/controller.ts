@@ -230,6 +230,19 @@ export const examsController = (svc: ExamsService) => ({
   },
 
   // USER EXAMS
+  getAttempt: async (req: FastifyRequest, reply: FastifyReply) => {
+    const app = req.server;
+    const { id: examId } = IDUUID.parse(req.params);
+
+    try {
+      const attempt = await svc.getAttempt(examId);
+
+      return reply.send({ message: "Success", data: attempt });
+    } catch (err: any) {
+      throw app.httpErrors.badRequest(err.message);
+    }
+  },
+
   joinExam: async (req: FastifyRequest, reply: FastifyReply) => {
     const app = req.server;
     const { id: userId } = IDUUID.parse(req.user);

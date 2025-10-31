@@ -182,6 +182,19 @@ export default async function examsRoutes(app: FastifyInstance) {
   );
 
   // USER EXAMS
+
+  app.get(
+    "/:id/attempt",
+    {
+      schema: {
+        tags: ["Exams - User Exams"],
+        summary: "Get attempt by exam id",
+        params: IDUUIDJSON,
+      },
+    },
+    ctrl.getAttempt
+  );
+
   app.post(
     "/start",
     {

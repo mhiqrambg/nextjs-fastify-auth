@@ -81,7 +81,6 @@ const DashboardLayoutSidebar = ({ sidebarItems, isOpen }: PropsTypes) => {
         </div>
 
         {/* Jika collapsed, tampilkan toggle kecil di bawah logo */}
-
         <Listbox
           items={sidebarItems}
           variant="solid"
@@ -146,6 +145,62 @@ const DashboardLayoutSidebar = ({ sidebarItems, isOpen }: PropsTypes) => {
             <ChevronsLeft className="h-4 w-4" />
           )}
         </button>
+      </div>
+
+      <div
+        className={cn("flex items-center p-1", isCollapsed && "justify-center")}
+      >
+        <button
+          type="button"
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={() => setIsCollapsed((v) => !v)}
+          className={cn(
+            "hidden lg:flex",
+            "absolute top-1/2 right-[-12px] -translate-y-1/2",
+            "h-8 w-8 items-center justify-center rounded-full",
+            "border-default-200 border bg-white shadow-md",
+            "hover:bg-default-100 z-50 transition-colors",
+          )}
+        >
+          {isCollapsed ? (
+            <ChevronsRight className="h-4 w-4" />
+          ) : (
+            <ChevronsLeft className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+
+      <div
+        className={cn(
+          "flex items-center gap-2",
+          isCollapsed ? "mb-2 justify-center" : "justify-start",
+        )}
+      >
+        {isCollapsed ? (
+          <Tooltip content="Logout" placement="right">
+            <Button
+              isIconOnly
+              variant="light"
+              color="danger"
+              aria-label="Logout"
+              onPress={handleLogout}
+              isLoading={isLoggingOut}
+            >
+              {isLoggingOut ? <Spinner size="sm" /> : <ArrowLeftToLine />}
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            variant="flat"
+            color="danger"
+            onPress={handleLogout}
+            className="w-full"
+            isLoading={isLoggingOut}
+            startContent={<ArrowLeftToLine />}
+          >
+            Logout
+          </Button>
+        )}
       </div>
     </div>
   );

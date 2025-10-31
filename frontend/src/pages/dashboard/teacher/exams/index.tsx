@@ -1,9 +1,9 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import TeacherExam from "@/components/views/Teacher/Exam";
+import { TeacherExam } from "@/components/views/Teacher/Exam";
 
 const TeacherExamPage = () => {
   return (
-    <DashboardLayout title="Exam" type="teacher" isOpen={true}>
+    <DashboardLayout title="Exams" type="teacher" isOpen={true}>
       <TeacherExam />
     </DashboardLayout>
   );

@@ -117,10 +117,8 @@ export const examService = {
   },
 
   // Get attempt by ID
-  getAttempt: async (attemptId: string) => {
-    const response = await instance.get(
-      `${endpoint.EXAMS}/attempts/${attemptId}`,
-    );
+  getAttempt: async (examId: string) => {
+    const response = await instance.get(`${endpoint.EXAMS}/${examId}/attempt`);
     return response.data;
   },
 

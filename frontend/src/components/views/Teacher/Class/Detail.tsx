@@ -22,7 +22,7 @@ import {
   User2,
   Hash,
   Info,
-  AlertTriangle,
+  Settings,
 } from "lucide-react";
 import {
   useClassroom,
@@ -36,6 +36,9 @@ import {
 } from "@/types/Classroom";
 import { formatDate } from "@/utils/date";
 import { initials } from "@/utils/string";
+import { TExams, TMembers } from "@/components/views/Teacher/Class";
+import { useDeleteClassroom } from "@/hooks/classroom/useClassrooms";
+import { useRouter } from "next/router";
 
 export default function OneClass({ id }: { id: string }) {
   const [activeTab, setActiveTab] = useState<"overview" | "members" | "exams">(
@@ -76,7 +79,20 @@ export default function OneClass({ id }: { id: string }) {
     return (examsData as any)?.data ?? (examsData as any);
   }, [examsData]);
 
-  // ------- Loading Root -------
+  const deleteMutation = useDeleteClassroom();
+  const router = useRouter();
+
+  const handleDelete = () => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete the class: ${classroom?.name}?`,
+      )
+    ) {
+      deleteMutation.mutate(classroom?.id ?? "");
+      router.push("/dashboard/teacher/class-room");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
@@ -100,7 +116,6 @@ export default function OneClass({ id }: { id: string }) {
     );
   }
 
-  // ------- Error Root -------
   if (isError) {
     return (
       <Card className="border-danger-200 bg-danger-50/40">
@@ -185,101 +200,6 @@ export default function OneClass({ id }: { id: string }) {
     </div>
   );
 
-  // ------- Members Tab Content -------
-  const MembersContent = (
-    <Card className="shadow-sm">
-      <CardBody>
-        {isMembersLoading || isMembersFetching ? (
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="flex-1">
-                  <Skeleton className="mb-2 h-4 w-40" />
-                  <Skeleton className="h-3 w-64" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : members && members.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            {members.map((member: TClassroomMember) => (
-              <div
-                key={member.member_id}
-                className="border-default-200 flex items-center justify-between gap-2 rounded-xl border p-2"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    isBordered
-                    size="md"
-                    name={member.member_name}
-                    src={member.member_image_url ?? undefined}
-                  />
-                  <div className="flex flex-col leading-tight">
-                    <span className="font-medium capitalize">
-                      {member.member_name}
-                    </span>
-                    <span className="text-default-500 text-xs">
-                      {member.member_email}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="light">
-                    Profile
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-default-500">No members found for this class.</p>
-        )}
-      </CardBody>
-    </Card>
-  );
-
-  // ------- Exams Tab Content -------
-  const ExamsContent = (
-    <Card className="shadow-sm">
-      <CardBody>
-        {isExamsLoading || isExamsFetching ? (
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : exams && exams.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            {exams.map((exam: TClassroomExam) => (
-              <div
-                key={exam.id}
-                className="border-default-200 flex items-center justify-between gap-2 rounded-xl border p-2"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col leading-tight">
-                    <span className="font-medium capitalize">{exam.title}</span>
-                    <span className="text-default-500 text-xs"></span>
-                    <span className="text-default-500 text-xs">
-                      {exam.description}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="light">
-                    Profile
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-default-500">No exams found for this class.</p>
-        )}
-      </CardBody>
-    </Card>
-  );
-
   return (
     <div className="flex flex-col gap-6">
       {Header}
@@ -338,11 +258,19 @@ export default function OneClass({ id }: { id: string }) {
                 </div>
               }
             >
-              {MembersContent}
+              <TMembers
+                isMembersLoading={isMembersLoading}
+                isMembersFetching={isMembersFetching}
+                members={members ?? []}
+              />
             </Tab>
 
             <Tab key="exams" title="Exams">
-              {ExamsContent}
+              <TExams
+                isExamsLoading={isExamsLoading}
+                isExamsFetching={isExamsFetching}
+                exams={exams ?? []}
+              />
             </Tab>
           </Tabs>
         </div>
@@ -401,6 +329,36 @@ export default function OneClass({ id }: { id: string }) {
                 </Tooltip>
               </div>
             </CardBody>
+          </Card>
+
+          <Card className="p-4 shadow-sm">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-primary flex items-center gap-2 font-semibold">
+                  <Settings className="text-primary h-5 w-5" /> Manage Class
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  color="primary"
+                  size="lg"
+                  startContent={<i className="lucide lucide-edit-3" />}
+                  className="w-full"
+                >
+                  Edit
+                </Button>
+                <Button
+                  color="danger"
+                  size="lg"
+                  startContent={<i className="lucide lucide-trash-2" />}
+                  className="w-full"
+                  onPress={() => handleDelete()}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
           </Card>
         </div>
       </div>

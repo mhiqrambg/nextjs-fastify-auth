@@ -18,6 +18,7 @@ import type {
   TCreateAnswerInput,
 } from "./validation";
 import { generateCode } from "../../helper/generateCode";
+import { transformExamDetail } from "./mapper";
 
 export type ExamsRepo = ReturnType<typeof examsModel>;
 
@@ -26,8 +27,16 @@ export const examsService = (repo: ExamsRepo) => {
     // EXAMS
     list: (params: TListExamsQuery) => repo.findAll(params),
 
-    getById: async (id: string): Promise<TExamRow | null> => {
-      const exam = await repo.findById(id);
+    getById: async (id: string): Promise<any> => {
+      const e = await repo.findByIdWithDetailsFlat(id);
+
+      if (!e) throw new Error("Exam not found");
+
+      const a = await repo.findAttemptByExamId(id);
+
+      const exam = transformExamDetail(e);
+
+      exam.attempts = a ?? [];
       return exam;
     },
 
@@ -149,6 +158,12 @@ export const examsService = (repo: ExamsRepo) => {
     },
 
     // USER EXAMS / START
+    getAttempt: async (examId: string) => {
+      const attempt = await repo.findAttemptByExamId(examId);
+      if (!attempt) throw new Error("Attempt not found");
+      return attempt;
+    },
+
     joinExam: async (data: TJoinExamInput, userId: string) => {
       const xm = await repo.findByCode(data.code);
       if (!xm) throw new Error("Exam not found");

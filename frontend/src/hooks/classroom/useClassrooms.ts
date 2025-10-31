@@ -15,7 +15,6 @@ import type {
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CloudLightning } from "lucide-react";
 
 const CreateClassroomSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
@@ -165,6 +164,18 @@ export function useUpdateMemberProgress() {
       queryClient.invalidateQueries({
         queryKey: ["classroom-members", variables.classroom_id],
       });
+    },
+  });
+}
+
+export function useDeleteClassroom() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (classroomId: string) =>
+      classroomService.deleteClassroom(classroomId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classrooms"] });
     },
   });
 }

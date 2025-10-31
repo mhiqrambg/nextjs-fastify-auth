@@ -14,7 +14,7 @@ import { TextSearch, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useClassrooms } from "@/hooks/classroom/useClassrooms";
 import { useRouter } from "next/router";
-import type { IClassroom } from "@/types/Classroom";
+import type { TClassroom } from "@/types/Classroom";
 
 const Class = () => {
   const router = useRouter();
@@ -91,7 +91,7 @@ const Class = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {classrooms.map((classroom: IClassroom) => (
+        {classrooms.map((classroom: TClassroom) => (
           <Card
             key={classroom.id}
             isPressable
@@ -121,10 +121,6 @@ const Class = () => {
                 <span className="font-mono font-semibold">
                   {classroom.code}
                 </span>
-              </div>
-              <div className="flex w-full items-center justify-between text-sm">
-                <span className="text-foreground/60">Max Students:</span>
-                <span className="font-semibold">{classroom.max_students}</span>
               </div>
             </CardFooter>
           </Card>

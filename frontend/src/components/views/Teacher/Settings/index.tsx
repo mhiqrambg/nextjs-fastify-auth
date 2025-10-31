@@ -1,9 +1,4 @@
-const TeacherSettingsView = () => {
-  return (
-    <div>
-      <h1>Teacher Settings</h1>
-    </div>
-  );
-};
-
-export default TeacherSettingsView;
+export { default } from "./Settings";
+export { default as AccountTab } from "./AccountTab";
+export { default as SecurityTab } from "./SecurityTab";
+export { default as MyClassTab } from "./MyClassTab";

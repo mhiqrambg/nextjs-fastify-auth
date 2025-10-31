@@ -28,16 +28,18 @@ export const examsModel = (app: FastifyInstance) => ({
     const { q, page, pageSize, sort, order } = params;
     const offset = (page - 1) * pageSize;
 
-    const sortCol = sort === "title" ? "title" : "created_at";
+    const sortCol = sort === "title" ? "e.title" : "e.created_at"; // pakai alias e
     const orderDir = order === "ASC" ? "ASC" : "DESC";
 
-    let whereClauses: string[] = ["is_active = true"];
+    // base filters
+    let whereClauses: string[] = ["e.is_active = true"];
     const queryParams: any[] = [];
     let paramIndex = 1;
 
+    // search filter
     if (q) {
       whereClauses.push(
-        `(title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`
+        `(e.title ILIKE $${paramIndex} OR e.description ILIKE $${paramIndex})`
       );
       queryParams.push(`%${q}%`);
       paramIndex++;
@@ -45,9 +47,10 @@ export const examsModel = (app: FastifyInstance) => ({
 
     const whereClause = whereClauses.join(" AND ");
 
+    // count query (tanpa join, cukup dari exams)
     const countSql = `
       SELECT COUNT(*)::int AS count
-      FROM exams
+      FROM exams e
       WHERE ${whereClause}
     `;
     const countRes = await app.db.query<{ count: number }>(
@@ -56,13 +59,28 @@ export const examsModel = (app: FastifyInstance) => ({
     );
     const total = countRes.rows[0]?.count ?? 0;
 
+    // main query (JOIN classrooms)
     const dataSql = `
-      SELECT id, user_id, classroom_id, title, description, duration_minutes, passing_score, code, is_active, created_at, updated_at
-      FROM exams
+      SELECT
+        e.id,
+        e.user_id,
+        e.classroom_id,
+        c.name AS classroom_name,
+        e.title,
+        e.description,
+        e.duration_minutes,
+        e.passing_score,
+        e.code,
+        e.is_active,
+        e.created_at,
+        e.updated_at
+      FROM exams e
+      LEFT JOIN classrooms c ON c.id = e.classroom_id
       WHERE ${whereClause}
       ORDER BY ${sortCol} ${orderDir}
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
+
     const dataRes = await app.db.query<TExamRow>(dataSql, [
       ...queryParams,
       pageSize,
@@ -74,9 +92,48 @@ export const examsModel = (app: FastifyInstance) => ({
 
   findById: (id: string) => {
     return app.db.one<TExamRow>(
-      `SELECT id, user_id, classroom_id, title, description, duration_minutes, passing_score, code, is_active, created_at, updated_at
-       FROM exams WHERE id = $1`,
+      `SELECT e.id, e.user_id, e.classroom_id, e.title, e.description, e.duration_minutes, 
+      e.passing_score, e.code, e.is_active, e.created_at, e.updated_at,
+      c.id AS classroom_id,
+      c.name AS classroom_name,
+      c.image_url AS classroom_image_url
+
+     FROM exams e
+     JOIN classrooms c ON e.classroom_id = c.id
+     WHERE e.id = $1`,
       [id]
+    );
+  },
+
+  findByIdWithDetailsFlat: async (examId: string) => {
+    const sql = `
+        SELECT
+            e.id AS exam_id, e.title AS exam_title, e.description, e.duration_minutes, e.passing_score, e.code AS exam_code, e.created_at, e.updated_at,
+            c.name AS classroom_name,
+            
+            eq.question_order,
+            q.id AS question_id, q.text AS question_text, 
+            
+            o.id AS option_id, o.text AS option_text, o.is_correct
+            
+        FROM exams e
+        LEFT JOIN classrooms c ON c.id = e.classroom_id
+        LEFT JOIN exam_questions eq ON eq.exam_id = e.id
+        LEFT JOIN questions q ON q.id = eq.question_id
+        LEFT JOIN options o ON o.question_id = q.id
+        
+        WHERE e.id = $1
+        ORDER BY eq.question_order ASC, o.id ASC
+    `;
+
+    const res = await app.db.query(sql, [examId]);
+    return res.rows;
+  },
+
+  findAttemptByExamId: (examId: string) => {
+    return app.db.many<TUserExamRow>(
+      `SELECT * FROM users_exams WHERE exam_id = $1`,
+      [examId]
     );
   },
 
@@ -163,12 +220,12 @@ export const examsModel = (app: FastifyInstance) => ({
 
   findQuestionsByExamId: async (examId: string): Promise<TQuestionRow[]> => {
     const sql = `
-      SELECT q.id, q.text, q.is_active, q.created_at, q.updated_at
-      FROM questions q
-      INNER JOIN exam_questions eq ON q.id = eq.question_id
-      WHERE eq.exam_id = $1 AND q.is_active = true
-      ORDER BY q.created_at ASC
-    `;
+      SELECT q.id, q.text, q.is_active, q.created_at, q.updated_at, eq.question_order
+        FROM questions q
+        INNER JOIN exam_questions eq ON q.id = eq.question_id
+        WHERE eq.exam_id = $1 AND q.is_active = true
+        ORDER BY eq.question_order ASC
+      `;
     const res = await app.db.query<TQuestionRow>(sql, [examId]);
     return res.rows;
   },

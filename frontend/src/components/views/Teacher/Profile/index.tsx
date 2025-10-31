@@ -1,9 +1,3 @@
-const TeacherProfileView = () => {
-  return (
-    <div>
-      <h1>Teacher Profile</h1>
-    </div>
-  );
-};
+import ProfileView from "./Profile";
 
-export default TeacherProfileView;
+export { ProfileView };

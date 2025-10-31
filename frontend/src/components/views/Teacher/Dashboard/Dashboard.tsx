@@ -12,7 +12,7 @@ import {
 
 import { useProfile } from "@/hooks/user/useProfile";
 
-const Dashboard = () => {
+const DashboardView = () => {
   const { data: profile, isLoading } = useProfile();
   console.log("profile", profile);
 
@@ -106,4 +106,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardView;

@@ -46,7 +46,7 @@ const SIDEBAR_USER = [
   {
     key: "My Exam",
     label: "My Exam",
-    href: "/dashboard/user/exam",
+    href: "/dashboard/user/exams",
     icon: <NotebookPen />,
   },
   {
@@ -98,9 +98,9 @@ const SIDEBAR_TEACHER = [
     icon: <School />,
   },
   {
-    key: "My Exam",
-    label: "My Exam",
-    href: "/dashboard/teacher/exam",
+    key: "My Exams",
+    label: "My Exams",
+    href: "/dashboard/teacher/exams",
     icon: <NotebookPen />,
   },
   {

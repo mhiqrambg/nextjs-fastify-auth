@@ -1,9 +1,5 @@
-const TeacherExam = () => {
-  return (
-    <div>
-      <h1>Teacher Exam</h1>
-    </div>
-  );
-};
+import TeacherExam from "./Exam";
+import ExamDetail from "./Detail";
+import ExamQuestions from "./Questions";
 
-export default TeacherExam;
+export { TeacherExam, ExamDetail, ExamQuestions };

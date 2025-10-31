@@ -1,16 +1,17 @@
 export interface IExam {
   id: string;
   title: string;
+  classroom_name?: string;
+  classroom_id?: string;
   description?: string;
-  duration: number; // in minutes
-  total_questions: number;
+  duration_minutes: number;
   passing_score: number;
-  difficulty: "easy" | "medium" | "hard";
-  category: string;
   is_active: boolean;
-  created_by: string;
   created_at: string;
   updated_at: string;
+  code: string;
+  questions: IQuestion[];
+  attempts: IExamAttempt[];
 }
 
 export interface IQuestion {

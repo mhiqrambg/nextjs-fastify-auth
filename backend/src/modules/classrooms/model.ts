@@ -80,6 +80,7 @@ export const classroomsModel = (app: FastifyInstance) => ({
        
        FROM classrooms c
        JOIN users u ON c.user_id = u.id
+       
        WHERE c.id = $1
        `,
       [id]

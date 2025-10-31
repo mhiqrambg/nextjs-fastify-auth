@@ -1,5 +1,7 @@
 import Class from "./Class";
-import OneClass from "./OneClass";
+import Detail from "./Detail";
 import CreateClass from "./CreateClass";
+import TExams from "./TExams";
+import TMembers from "./TMembers";
 
-export { Class, OneClass, CreateClass };
+export { Class, Detail, CreateClass, TExams, TMembers };
